@@ -16,8 +16,8 @@
 </h2>
 
 <div id="form_div" style="text-align: center;">    
-    <form id="submitText" name="form" method="POST" style="text-align: center;"
-        action="http://127.0.0.1:8080/api/openVisualiseAcrossSheets">
+    <form  target=”_blank” id="submitText" name="form" method="POST" style="text-align: center;"
+        action="http://127.0.0.1:8080/api/openVisualiseAcrossSheets" onsubmit="return required()">
         <!-- <input name="idList" value= "ADDICTO:0000323 ADDICTO:0000322 BCIO:011007 BCIO:011062 BCIO:018000"> -->
         <!-- todo: placeholder not working?-->
         <h4>
@@ -41,7 +41,17 @@
 
 
 <script>
-
+function required(){
+        var empt = document.forms["form"]["repo"].value;
+        if (empt == "") {
+        alert("Please input an Ontology");
+        return false;
+        }
+        else {
+        alert('Code has accepted : you can try another');
+        return true; 
+        }
+}
 </script>
 
 </body>
