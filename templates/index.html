@@ -7,66 +7,30 @@
 
 <html>
 <meta charset="utf-8">
-<head>
+<!-- <head>
     <h1 style="text-align: center;">
-        External access to GraphViz visualisation for a list of ID's
+        Ontology Visualisation
     </h1>
-</head>
-
+</head> -->
+<br>
 
     <h2 style="text-align: center;">
-        Try an example of external access to visualisation for ids here:
+        Input a list of ID's below, choose your Ontology, then press "Submit":
     </h2>
-    <!-- <h2 style="color: green;">
-        onto-spread-ed
-    </h2> -->
+    
     <div id="form_div" style="text-align: center;">
-        <p>
-            Click on the button to create
-            a form dynamically, then press "Submit" to access the visualisation for the selected ids.
-        </p>
-
-        <button id="click_here" onClick="ID_Fun()">
-            click here
-        </button>
+        <form id="submitText" name="form" method="POST" style="text-align: center;" action="http://127.0.0.1:8080/api/openVisualiseAcrossSheets">
+            <!-- <input name="idList" value= "ADDICTO:0000323 ADDICTO:0000322 BCIO:011007 BCIO:011062 BCIO:018000"> -->
+            <!-- todo: placeholder not working for textarea??-->
+            <textarea id="idList" form="submitText" class="form-control" placeholder="List of IDs separated by spaces eg: BCIO:011062 ADDICTO:0000322" 
+                  name="idList" rows="10">ADDICTO:0000323 ADDICTO:0000322 BCIO:011007 BCIO:011062 BCIO:018000</textarea>
+            <input name="repo" value = "AddictO BCIO">
+            <input type="submit" value="Submit">
+        </form>
+        
     </div>
     <script>
-        function ID_Fun() {
-
-            // Create a form dynamically
-            form = document.createElement("FORM");
-            form.name = 'form';
-            form.method = 'POST';
-            form.style="text-align: center;"
-            //test: 
-            form.action = 'http://127.0.0.1:8080/api/openVisualiseAcrossSheets';
-            // form.action = 'https://onto-spread-ed.ew.r.appspot.com/api/openVisualiseAcrossSheets';
-
-            // form.action = 'http://me.mydomain.com:8080/api/openVisualiseAcrossSheets';            
-            var input = document.createElement('input');
-            input.name = "idList";
-            input.value = "ADDICTO:0000323 ADDICTO:0000322 ADDICTO:0000324 ADDICTO:0000967 ADDICTO:0000325 ADDICTO:0000326";
-            form.appendChild(input);
-
-            var input2 = document.createElement('input');
-            input2.name = "repo";
-            input2.value = "AddictO";
-            form.appendChild(input2);
-
-            // Create a submit button
-            var s = document.createElement("input");
-            s.setAttribute("type", "submit");
-            s.setAttribute("value", "Submit");
-            // Append the button to the form
-            form.append(s);
-            // Append the form to the page
-            // form.after($("#form_div"))
-            $("#form_div").append(form);
-            $("#click_here").hide();
-
-            // document.body.appendChild(form);
-        }
-        ID_Fun(); //todo: remove the function, turn it into a div? 
+        
     </script>
     
 </body>
