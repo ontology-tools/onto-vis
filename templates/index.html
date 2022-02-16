@@ -1,38 +1,49 @@
 {% extends "base.html" %}
 {% block title %}{{ config['APP_TITLE'] }}{% endblock %}
 {% block head %}
-  {{ super() }}
+{{ super() }}
 {% endblock %}
 {% block content %}
 
 <html>
+<body>
+
 <meta charset="utf-8">
-<!-- <head>
-    <h1 style="text-align: center;">
-        Ontology Visualisation
-    </h1>
-</head> -->
 <br>
 
-    <h2 style="text-align: center;">
-        Input a list of ID's below, choose your Ontology, then press "Submit":
-    </h2>
-    
-    <div id="form_div" style="text-align: center;">
-        <form id="submitText" name="form" method="POST" style="text-align: center;" action="http://127.0.0.1:8080/api/openVisualiseAcrossSheets">
-            <!-- <input name="idList" value= "ADDICTO:0000323 ADDICTO:0000322 BCIO:011007 BCIO:011062 BCIO:018000"> -->
-            <!-- todo: placeholder not working for textarea??-->
-            <textarea id="idList" form="submitText" class="form-control" placeholder="List of IDs separated by spaces eg: BCIO:011062 ADDICTO:0000322" 
-                  name="idList" rows="10">ADDICTO:0000323 ADDICTO:0000322 BCIO:011007 BCIO:011062 BCIO:018000</textarea>
-            <input name="repo" value = "AddictO BCIO">
-            <input type="submit" value="Submit">
-        </form>
-        
-    </div>
-    <script>
-        
-    </script>
-    
+<h2 style="text-align: center;">
+    Input a list of ID's below, choose your Ontology, then press "Submit":
+</h2>
+
+<div id="form_div" style="text-align: center;">    
+    <form id="submitText" name="form" method="POST" style="text-align: center;"
+        action="http://127.0.0.1:8080/api/openVisualiseAcrossSheets">
+        <!-- <input name="idList" value= "ADDICTO:0000323 ADDICTO:0000322 BCIO:011007 BCIO:011062 BCIO:018000"> -->
+        <!-- todo: placeholder not working?-->
+        <h4>
+            <span class="badge badge-pill badge-info">
+                List of ID's separated by spaces
+            </span>
+        </h4>
+        <textarea id="idList" form="submitText" class="form-control"
+            placeholder="EG: BCIO:011062 ADDICTO:0000322 - leave blank for full list" name="idList"rows="10">ADDICTO:0000323 ADDICTO:0000322 BCIO:011007 BCIO:011062 BCIO:018000
+        </textarea>
+        <br>
+        <h4>
+            <span class="badge badge-pill badge-info" placeholder="EG: AddictO BCIO">
+                List of Ontologies separated by spaces
+            </span>
+        </h4>
+        <input id="repo-text-box" name="repo" value="AddictO BCIO">
+        <input class="btn btn-outline-info" type="submit" value="Submit">
+    </form>
+</div>
+
+
+<script>
+
+</script>
+
 </body>
 
 
