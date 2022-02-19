@@ -17,11 +17,11 @@
 
 <div id="form_div" style="text-align: center;">    
     <form  target=”_blank” id="submitText" name="form" method="POST" style="text-align: center;"
-        action="http://127.0.0.1:8080/api/openVisualiseAcrossSheets" onsubmit="return required()">
-        <!-- <input name="idList" value= "ADDICTO:0000323 ADDICTO:0000322 BCIO:011007 BCIO:011062 BCIO:018000"> -->
-        <!-- todo: placeholder not working?-->
+        action="http://127.0.0.1:8080/api/openVisualiseAcrossSheetsVis" onsubmit="return required()"> <!--local test version-->
+        <!-- action="http://me.mydomain.com:8080/api/openVisualiseAcrossSheets onsubmit="return required()"> --> <!--production version-->
+        
         <h4>
-            <span class="badge badge-pill badge-info">
+            <span class="badge badge-primary">
                 List of ID's separated by spaces
             </span>
         </h4>
@@ -30,25 +30,30 @@
         </textarea>
         <br>
         <h4>
-            <span class="badge badge-pill badge-info" placeholder="EG: AddictO BCIO">
+            <span class="badge badge-primary" placeholder="EG: AddictO BCIO">
                 List of Ontologies separated by spaces
             </span>
         </h4>
         <input id="repo-text-box" name="repo" value="AddictO BCIO">
-        <input class="btn btn-outline-info" type="submit" value="Submit">
+        <input class="btn btn-outline-primary" type="submit" value="Submit">
     </form>
 </div>
 
 
 <script>
+    $(document).ready(function() {
+        // alert("loaded");
+        
+    });
+
 function required(){
         var empt = document.forms["form"]["repo"].value;
-        if (empt == "") {
+        if (empt == "") {            
         alert("Please input an Ontology");
         return false;
         }
         else {
-        alert('Code has accepted : you can try another');
+        // alert('Code has accepted : you can try another');
         return true; 
         }
 }
