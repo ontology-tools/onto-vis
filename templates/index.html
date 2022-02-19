@@ -31,10 +31,16 @@
         <br>
         <h4>
             <span class="badge badge-primary" placeholder="EG: AddictO BCIO">
-                List of Ontologies separated by spaces
+                Choice of Ontologies
             </span>
         </h4>
-        <input id="repo-text-box" name="repo" value="AddictO BCIO">
+        <!-- <select name="dropdown" form="submitText" multiple size="2">
+            <option value = "AddictO" selected>AddictO</option>
+            <option value = "BCIO">BCIO</option>
+        </select> -->
+        <input id="ontology1" type="checkbox" name="ontology1" value="BCIO">BCIO
+        <input id="ontology2" type="checkbox" name="ontology2" value="AddictO">AddictO
+        <input id="repo-text-box" name="repo" value="" hidden="true">
         <input class="btn btn-outline-primary" type="submit" value="Submit">
     </form>
 </div>
@@ -47,15 +53,37 @@
     });
 
 function required(){
-        var empt = document.forms["form"]["repo"].value;
-        if (empt == "") {            
-        alert("Please input an Ontology");
+        ontologyValues = ""
+        //todo: do multiple checkboxes in a for loop, not one by one!
+        if($('#ontology1').get(0).checked){
+            ontologyValues = ontologyValues + "BCIO ";
+        }
+        if($('#ontology2').get(0).checked){
+            ontologyValues = ontologyValues + "AddictO ";
+        }
+        // console.log("got ontologyValues: " + ontologyValues);
+        $('#repo-text-box').val(ontologyValues);
+        // console.log("got ontologyValues: " + $('#repo-text-box').val());
+
+        
+        if (ontologyValues == "") {            
+        alert("Please choose an Ontology");
         return false;
         }
         else {
         // alert('Code has accepted : you can try another');
         return true; 
         }
+
+        // var empt = document.forms["form"]["repo"].value; //todo: not getting updated value..
+        // if (empt == "") {            
+        // alert("Please input an Ontology");
+        // return false;
+        // }
+        // else {
+        // // alert('Code has accepted : you can try another');
+        // return true; 
+        // }
 }
 </script>
 
