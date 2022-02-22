@@ -18,7 +18,7 @@
 <div id="form_div" style="text-align: center;">    
     <form  target=”_blank” id="submitText" name="form" method="POST" style="text-align: center;"
         action="http://127.0.0.1:8080/api/openVisualiseAcrossSheetsVis" onsubmit="return required()"> <!--local test version-->
-        <!-- action="http://me.mydomain.com:8080/api/openVisualiseAcrossSheetsVis onsubmit="return required()"> --> <!--production version-->
+        <!-- action="https://onto-spread-ed.ew.r.appspot.com/api/openVisualiseAcrossSheetsVis" onsubmit="return required()"> --> <!--production version-->
         
         <h4>
             <span class="badge badge-primary">
@@ -54,12 +54,12 @@
 
 function required(){
         ontologyValues = ""
-        //todo: do multiple checkboxes in a for loop, not one by one!
+        //todo: do multiple checkboxes in a for loop, not one by one! (may have 15+)
         if($('#ontology1').get(0).checked){
-            ontologyValues = ontologyValues + "BCIO ";
+            ontologyValues = ontologyValues + "{{ontologies[0]}}" + " ";
         }
         if($('#ontology2').get(0).checked){
-            ontologyValues = ontologyValues + "AddictO ";
+            ontologyValues = ontologyValues + "{{ontologies[1]}}" + " ";
         }
         // console.log("got ontologyValues: " + ontologyValues);
         $('#repo-text-box').val(ontologyValues);
