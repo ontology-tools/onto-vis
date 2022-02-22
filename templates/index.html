@@ -34,12 +34,10 @@
                 Choice of Ontologies
             </span>
         </h4>
-        <!-- <select name="dropdown" form="submitText" multiple size="2">
-            <option value = "AddictO" selected>AddictO</option>
-            <option value = "BCIO">BCIO</option>
-        </select> -->
-        <input id="ontology1" type="checkbox" name="ontology1" value="BCIO">BCIO
-        <input id="ontology2" type="checkbox" name="ontology2" value="AddictO">AddictO
+        
+        {% for ont in ontologies %}
+        <input id="{{ont}}" type="checkbox" name="{{ont}}" value="{{ont}}">{{ont}}
+        {% endfor %}
         <input id="repo-text-box" name="repo" value="" hidden="true">
         <input class="btn btn-outline-primary" type="submit" value="Submit">
     </form>
@@ -54,13 +52,11 @@
 
 function required(){
         ontologyValues = ""
-        //todo: do multiple checkboxes in a for loop, not one by one! (may have 15+)
-        if($('#ontology1').get(0).checked){
-            ontologyValues = ontologyValues + "{{ontologies[0]}}" + " ";
+        {% for ont in ontologies %}
+        if($('#{{ont}}').get(0).checked){
+            ontologyValues = ontologyValues + "{{ont}}" + " ";
         }
-        if($('#ontology2').get(0).checked){
-            ontologyValues = ontologyValues + "{{ontologies[1]}}" + " ";
-        }
+        {% endfor %}
         // console.log("got ontologyValues: " + ontologyValues);
         $('#repo-text-box').val(ontologyValues);
         // console.log("got ontologyValues: " + $('#repo-text-box').val());
@@ -75,15 +71,6 @@ function required(){
         return true; 
         }
 
-        // var empt = document.forms["form"]["repo"].value; //todo: not getting updated value..
-        // if (empt == "") {            
-        // alert("Please input an Ontology");
-        // return false;
-        // }
-        // else {
-        // // alert('Code has accepted : you can try another');
-        // return true; 
-        // }
 }
 </script>
 
