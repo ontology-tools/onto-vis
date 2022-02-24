@@ -292,8 +292,8 @@ def home():
 #     return render_template("index.html", ontologies=ontologies)
 
 #api for onto-vis:
-@app.route('/openVisualiseAcrossSheetsVis', methods=['POST'])
-def openVisualiseAcrossSheetsVis():
+@app.route('/visualise', methods=['POST'])
+def visualise():
     print("open called")
     #build data we need for dotStr query (new one!)
     if request.method == "POST":
@@ -319,5 +319,5 @@ def openVisualiseAcrossSheetsVis():
         #NOTE: APP_TITLE2 can't be blank - messes up the spacing  
         APP_TITLE2 = "VISUALISATION" #could model this on calling url here? Or something else..
         #test full sheet: 
-        return render_template("visualiseapi.html", sheet="selection", repo=repo, dotStr=dotStr, api=True, APP_TITLE2=APP_TITLE2)
+        return render_template("visualise.html", sheet="selection", repo=repo, dotStr=dotStr, APP_TITLE2=APP_TITLE2)
         # return render_template("visualise.html", sheet="selection", repo=repo, dotStr=dotStr, api=True, APP_TITLE2=APP_TITLE2)

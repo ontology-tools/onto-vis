@@ -43,7 +43,7 @@
 
         <div class="col-md-12">
             <div class="col-8">
-                <h2 id="s-name"> API VISUALISATIONS: {{sheet}} </h2>
+                <h2 id="s-name"> VISUALISATION: {{sheet}} </h2>
                 <p id="error-message"></p>
             </div class="col-4">
 
@@ -201,7 +201,7 @@
         {% else %}
         // push default to dots array 8 times - todo: think this is not necessary now?
         var default_dot = `{{ dotStr | safe}}`
-        console.log("got dotStr" + default_dot);
+        // console.log("got dotStr" + default_dot);
         for (var i = 0; i < 8; i++) {
             dots.push(default_dot);
         }
@@ -353,7 +353,7 @@
             //replace inputTextVal " " with newline:
             var inputTextVal2 = inputTextVal.val().replace(/ /g, "\n");
 
-            console.log("got input-text: " + inputTextVal2);
+            // console.log("got input-text: " + inputTextVal2);
             const context = canvas.getContext('2d');
 
             context.clearRect(0, 0, canvas.width, canvas.height);
