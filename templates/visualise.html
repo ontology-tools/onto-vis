@@ -43,7 +43,7 @@
 
         <div class="col-md-12">
             <div class="col-8">
-                <h2 id="s-name"> VISUALISATION: {{sheet}} </h2>
+                <h2 id="s-name"> {{APP_TITLE2}} : {{sheet}} </h2>
                 <p id="error-message"></p>
             </div class="col-4">
 
@@ -275,8 +275,6 @@
                 let saveImage = (img_name) => {
                     let a = document.createElement('a');
                     a.href = url2;
-                    // a.href = pic.toDataURL("image/png"); //todo: should we convert to png image? needs work..
-                    // a.download = img_name; //this saves as .xlsx in chrome
                     //change to .svg:
                     a.download = img_name.slice(0, -5) + ".svg";
                     document.body.appendChild(a);

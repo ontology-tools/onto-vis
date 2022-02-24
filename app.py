@@ -28,12 +28,7 @@ cors = CORS(app, resources={
 })
 
 app.config.from_object('config')
-# cache = Cache(app) #caching
-# set cache for each prefix in prefixes:    
-# for prefix in PREFIXES: 
-#     cache.set("latestID" + prefix[0], 0)
-# cache.set("latestID",0) #initialise caching
-# print("cache initialised")
+
 
 github = GitHub(app)
 
@@ -130,51 +125,6 @@ class OntologyDataStore:
             all_IDs.add(classId)
         return( all_IDs )
 
-    def parseSheetData(self, repo, data):
-        for entry in data:
-            if 'ID' in entry and \
-                    'Label' in entry and \
-                    'Definition' in entry and \
-                    'Parent' in entry and \
-                    len(entry['ID'])>0:
-                entryId = entry['ID'].replace(":", "_")
-                entryLabel = entry['Label'].strip()
-                self.label_to_id[entryLabel] = entryId
-                self.graphs[repo].add_node(entryId, label=entryLabel.replace(" ", "\n"), **OntologyDataStore.node_props)
-                if entryId in self.graphs[repo].nodes:
-                    self.graphs[repo].remove_node(entryId)
-                    self.graphs[repo].add_node(entryId, label=entryLabel.replace(" ", "\n"), **OntologyDataStore.node_props)
-        for entry in data:
-            if 'ID' in entry and \
-                    'Label' in entry and \
-                    'Definition' in entry and \
-                    'Parent' in entry and \
-                    len(entry['ID'])>0:
-                entryParent = re.sub("[\[].*?[\]]", "", str(entry['Parent'])).strip()
-                if entryParent in self.label_to_id:  # Subclass relations
-                    # Subclass relations must be reversed for layout
-                    self.graphs[repo].add_edge(self.label_to_id[entryParent],
-                                               entry['ID'].replace(":", "_"), dir="back")
-                for header in entry.keys():  # Other relations
-                    if entry[header] and str(entry[header]).strip() and "REL" in header:
-                        # Get the rel name
-                        rel_names = re.findall(r"'([^']+)'", header)
-                        if len(rel_names) > 0:
-                            rel_name = rel_names[0]
-                            if rel_name in OntologyDataStore.rel_cols:
-                                rcolour = OntologyDataStore.rel_cols[rel_name]
-                            else:
-                                rcolour = "orange"
-
-                            relValues = entry[header].split(";")
-                            for relValue in relValues:
-                                if relValue.strip() in self.label_to_id:
-                                    self.graphs[repo].add_edge(entry['ID'].replace(":", "_"),
-                                                               self.label_to_id[relValue.strip()],
-                                                               color=rcolour,
-                                                               label=rel_name)
- 
- 
     def getRelatedIDs(self, repo, selectedIds):
         # Add all descendents of the selected IDs, the IDs and their parents.
         # print(selectedIds)
@@ -208,16 +158,6 @@ class OntologyDataStore:
             except:
                 pass
         return (ids)
-
-    
-    
-
-    def getDotForIDs(self, repo, selectedIds):
-        # Add all descendents of the selected IDs, the IDs and their parents.
-        ids = OntologyDataStore.getRelatedIDs(self, repo, selectedIds) 
-        subgraph = self.graphs[repo].subgraph(ids)
-        P = networkx.nx_pydot.to_pydot(subgraph)
-        return (P) 
 
     def getDotForMultipleIDs(self, repos, selectedIds):
         # Add all descendents of the selected IDs, the IDs and their parents.
@@ -284,14 +224,6 @@ def home():
     ontologies = ["BCIO", "AddictO"]
     return render_template("index.html", ontologies=ontologies)
 
-#test func:
-# @app.route('/openVisualiseAcrossSheetsVis', methods=['POST'])
-# def openVisualiseAcrossSheetsVis():
-#     print("openvisualise submit pressed.")
-#     ontologies = ["BCIO", "AddictO"]
-#     return render_template("index.html", ontologies=ontologies)
-
-#api for onto-vis:
 @app.route('/visualise', methods=['POST'])
 def visualise():
     print("open called")
@@ -302,7 +234,7 @@ def visualise():
         idList = idString.split()
         repos = repo.split()
         for repo in repos:            
-            ontodb.parseRelease(repo) #todo: can we do this? 
+            ontodb.parseRelease(repo) 
         if len(idList) == 0:
             print("got zero length idList")
             allIds = ontodb.getReleaseIDs(repo)
@@ -312,12 +244,9 @@ def visualise():
                 if ID is not None and ID != "":
                     idList.append(ID.strip())
         
-        # dotStr = ontodb.getDotForIDs(repo,idList).to_string()
-        #test multiple repo's: 
-        # repos = ["AddictO", "BCIO"]
         dotStr = ontodb.getDotForMultipleIDs(repos,idList).to_string()
+
         #NOTE: APP_TITLE2 can't be blank - messes up the spacing  
-        APP_TITLE2 = "VISUALISATION" #could model this on calling url here? Or something else..
-        #test full sheet: 
+        APP_TITLE2 = "VISUALISATION" 
+        
         return render_template("visualise.html", sheet="selection", repo=repo, dotStr=dotStr, APP_TITLE2=APP_TITLE2)
-        # return render_template("visualise.html", sheet="selection", repo=repo, dotStr=dotStr, api=True, APP_TITLE2=APP_TITLE2)

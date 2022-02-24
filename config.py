@@ -90,17 +90,6 @@ else:
     response = client.access_secret_version(request={"name": name})
     SECRET_KEY = response.payload.data.decode("UTF-8")
 
-USERS_METADATA = {"tomjuggler": {"initials":"ZZ", "repositories":["AddictO","BCIO"]},
-                  "jannahastings": {"initials":"JH", "repositories":["AddictO","BCIO"]},
-                  "robertjwest": {"initials":"RW", "repositories":["AddictO","BCIO"]},
-                  "sharoncox":{"initials":"SC", "repositories":["AddictO"]},
-                  "ksoar":{"initials":"KS", "repositories":["AddictO"]},
-                  "CaitlinNotley702": {"initials":"CN", "repositories":["AddictO"]},
-                  "CaitlinNotley": {"initials":"CN", "repositories":["AddictO"]},
-                  "alisonjwright":{"initials":"AW", "repositories":["BCIO","AddictO"]},
-                  "zcbtelh": {"initials":"EH", "repositories":["BCIO"]},
-                  "candicemooreucl": {"initials":"CM", "repositories":["BCIO"]},
-                  "oscarcastroserrano": {"initials":"OC", "repositories":["BCIO"]},
-                  "emilyjhayes": {"initials":"EJH", "repositories":["BCIO"]},
-                  "paulinaschenk": {"initials":"PS", "repositories": ["BCIO"]}}
-ALL_USERS_INITIALS = [v["initials"] for v in USERS_METADATA.values()]
+
+
+APP_TITLE="onto-vis"
