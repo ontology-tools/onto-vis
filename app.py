@@ -2,7 +2,7 @@ from flask import Flask, request, g, session, redirect, url_for, render_template
 from flask import render_template_string, jsonify, Response, send_file
 from flask_cors import CORS
 # from flask_caching import Cache
-from flask_github import GitHub
+#from flask_github import GitHub
 import pyhornedowl
 import networkx
 import re
@@ -30,7 +30,7 @@ cors = CORS(app, resources={
 app.config.from_object('config')
 
 
-github = GitHub(app)
+#github = GitHub(app)
 
 
 class OntologyDataStore:
@@ -250,3 +250,7 @@ def visualise():
         APP_TITLE2 = "VISUALISATION" 
         
         return render_template("visualise.html", sheet="selection", repo=repo, dotStr=dotStr, APP_TITLE2=APP_TITLE2)
+
+
+if __name__ == "__main__":        # on running python app.py
+    app.run(debug=app.config["DEBUG"], port=5001)        # run the flask app
