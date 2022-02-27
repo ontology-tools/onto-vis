@@ -10,6 +10,8 @@ from io import StringIO  #for download
 import requests #for download
 import threading
 
+import json
+
 import whoosh
 from whoosh.qparser import MultifieldParser,QueryParser
 from datetime import date
@@ -29,6 +31,29 @@ cors = CORS(app, resources={
 
 app.config.from_object('config')
 
+location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
+location2 = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
+
+print("Fetching release file from", location)
+ontol1 = pyhornedowl.open_ontology(urlopen(location).read().decode('utf-8'))
+print("Fetching release file from", location2)
+ontol2 = pyhornedowl.open_ontology(urlopen(location2).read().decode('utf-8'))
+
+ontoDict = {
+    "ontologies": [       
+        {
+            "label": "BCIO",
+            "name": "BCIO",
+            "ontology": ontol2
+        },
+        
+        {
+            "label": "AddictO",
+             "name": "AddictO",
+            "ontology": ontol1
+        },
+    ]
+}
 
 #github = GitHub(app)
 
@@ -217,12 +242,47 @@ class OntologyDataStore:
 
 ontodb = OntologyDataStore()
 
+#test function from onto-text-tag: 
+# def get_ids(ontol_list):
+#     # print("get_ids running here")
+#     checklist = []
+#     for ontol in [ontol1,ontol2]:
+#         for classIri in ontol.get_classes():
+#             # print("for classIri running")        
+#             classId = ontol.get_id_for_iri(classIri)
+#             label = ontol.get_annotation(classIri, RDFSLABEL)
+#             # label = ontol.get_annotation(classId, RDFSLABEL)
+#             if classId:
+#                 print("got classId and labels") 
+#                 checklist.append(classId + "|"+ label)                   
+#                 print(classId)
+#                 print(label)
+                    
+#     return checklist
+
 
 @app.route('/')
 @app.route('/home')
 def home():
+    # ontologiesT = ontoDict["ontologies"]
+
+    # labels = get_ids(ontologiesT) 
     ontologies = ["BCIO", "AddictO"]
-    return render_template("index.html", ontologies=ontologies)
+    for repo in ontologies:    #todo: fix this horrible repo repo repos        
+            ontodb.parseRelease(repo)
+    allIds = ontodb.getReleaseIDs(repo)
+    print(allIds)
+    idList = []
+    for ID in allIds: 
+        if ID is not None and ID != "":
+            idList.append(ID.strip())
+    print("idList is: ", idList)
+    # labels = ontodb.getReleaseIDs("BCIO") #todo: support multiple repo's 
+    # # labels = get_ids(ontoDict) 
+    # label_list={'labels': labels}
+    # json.dumps(label_list)
+    # print("home label_list is: ", label_list)
+    return render_template("index.html", label_list=idList, ontologies=ontologies) #todo: fix label_list name is incorrect on front end, change when updated in index.html
 
 @app.route('/visualise', methods=['POST'])
 def visualise():
@@ -233,7 +293,7 @@ def visualise():
         repo = request.form.get("repo")
         idList = idString.split()
         repos = repo.split()
-        for repo in repos:            
+        for repo in repos:    #todo: fix this horrible repo repo repos        
             ontodb.parseRelease(repo) 
         if len(idList) == 0:
             print("got zero length idList")

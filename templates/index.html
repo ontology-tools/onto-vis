@@ -4,7 +4,61 @@
 {{ super() }}
 {% endblock %}
 {% block content %}
-
+<style>
+    ul.bs-autocomplete-menu {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      max-height: 200px;
+      overflow: auto;
+      z-index: 9999;
+      border: 1px solid #eeeeee;
+      border-radius: 4px;
+      background-color: #fff;
+      box-shadow: 0px 1px 6px 1px rgba(0, 0, 0, 0.4);
+    }
+  
+    ul.bs-autocomplete-menu a {
+      font-weight: normal;
+      color: #333333;
+    }
+  
+    .ui-helper-hidden-accessible {
+      border: 0;
+      clip: rect(0 0 0 0);
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      padding: 0;
+      position: absolute;
+      width: 1px;
+    }
+  
+    .ui-state-active,
+    .ui-state-focus {
+      color: #23527c;
+      background-color: #eeeeee;
+    }
+  
+    ul.bs-autocomplete-menu li {
+      text-align: left;
+      border-radius: 50%;
+      border: .25em solid #ccc;
+  
+      
+    }
+  
+    .bs-autocomplete-feedback {
+      width: 1.5em;
+      height: 1.5em;
+      overflow: hidden;
+      margin-top: .5em;
+      margin-right: .5em;
+    }
+  
+   
+  </style>
 <html>
 <body>
 
@@ -14,6 +68,28 @@
 <h2 style="text-align: center;">
     Input a list of ID's below, choose your Ontology, then press "Submit":
 </h2>
+
+<div class="container">
+    <!-- <h1>jQuery UI autocomplete for Bootstrap</h1>
+      <p>Demo version with local data.</p> -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="form-group">
+          <label for="ac-demo" class="control-label">Look up ID's here:</label>
+          <input class="form-control bs-autocomplete" id="ac-demo" value="" placeholder="ID or Label..." type="text"
+            data-source="demo_source.php" data-hidden_field_id="city-code" data-item_id="id" data-item_label="name"
+            autocomplete="off">
+        </div>
+      </div>
+      <div class="col-xs-3">
+        <div class="form-group">
+          <input class="form-control" id="city-code" name="citycode" value="" type="number" readonly>
+          <!--todo: what is readonly for?-->
+        </div>
+      </div>
+    </div>
+  </div>
+  
 
 <div id="form_div" style="text-align: center;">    
     <form  target=”_blank” id="submitText" name="form" method="POST" style="text-align: center;"
@@ -44,6 +120,112 @@
 
 
 <script>
+    //ID complete functions from onto-text-tag
+     $(function () {
+    $('[data-toggle="popover"]').popover({ html: true });
+  })
+
+  var ontologyArray = [];
+  var idResultList = [];
+  var labelJson = '{{label_list | tojson | safe}}';
+  // console.log("labelJson is: " + labelJson);
+  var labelArray = []; //get right format
+  var labelList = JSON.parse('{{label_list | tojson | safe}}');
+  console.log("got labelList: ", labelList)
+  var labels = labelList;
+  labels.forEach(function (label, i) {
+    labelArray.push({ id: i, name: label });
+    // console.log("got label: " + label);
+  });
+
+  //test jQuery UI:
+  $.widget("ui.autocomplete", $.ui.autocomplete, {
+
+    _renderMenu: function (ul, items) {
+      var that = this;
+      ul.attr("class", "nav nav-pills nav-stacked  bs-autocomplete-menu");
+      $.each(items, function (index, item) {
+        that._renderItemData(ul, item);
+      });
+    },
+
+    _resizeMenu: function () {
+      var ul = this.menu.element;
+      ul.outerWidth(Math.min(
+        // Firefox wraps long text (possibly a rounding bug)
+        // so we add 1px to avoid the wrapping (#7513)
+        ul.width("").outerWidth() + 1,
+        this.element.outerWidth()
+      ));
+    }
+
+  });
+
+  (function () {
+    "use strict";
+
+
+
+
+    $('.bs-autocomplete').each(function () {
+      var _this = $(this),
+        _data = _this.data(),
+        _hidden_field = $('#' + _data.hidden_field_id);
+      _hidden_field.hide();
+
+      _this.after('<div class="bs-autocomplete-feedback form-control-feedback"><div class="loader">Loading...</div></div>')
+        .parent('.form-group').addClass('has-feedback');
+
+      var feedback_icon = _this.next('.bs-autocomplete-feedback');
+      feedback_icon.hide();
+
+      _this.autocomplete({
+        minLength: 2,
+        autoFocus: false,
+
+        source: function (request, response) {
+          var _regexp = new RegExp(request.term, 'i');
+          var data = labelArray.filter(function (item) {
+            // console.log("item is: ", item);
+            return item.name.match(_regexp);
+          });
+          response(data);
+        },
+
+        search: function () {
+          feedback_icon.show();
+          _hidden_field.val('');
+        },
+
+        response: function () {
+          feedback_icon.hide();
+        },
+
+        focus: function (event, ui) {
+          _this.val(ui.item[_data.item_label]);
+          event.preventDefault();
+        },
+
+        select: function (event, ui) {
+          _this.val(ui.item[_data.item_label]);
+          _hidden_field.val(ui.item[_data.item_id]);
+          event.preventDefault();
+          idResultList.push(ui.item[_data.item_label]);
+          $("#idList").val(idResultList);
+          _this.val(""); //clear input on submit
+        }
+      })
+        .data('ui-autocomplete')._renderItem = function (ul, item) {
+          return $('<li></li>')
+            .data("item.autocomplete", item)
+            .append('<a>' + item[_data.item_label] + '</a>')
+            .append('<br>')
+            .appendTo(ul);
+        };
+      // end autocomplete
+    });
+  })();
+
     $(document).ready(function() {
         // alert("loaded");
         
