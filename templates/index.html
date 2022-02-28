@@ -97,11 +97,11 @@
     
         <h4>
             <span class="badge badge-primary">
-                List of ID's separated by spaces
+                List of ID's separated by commas
             </span>
         </h4>
         <textarea id="idList" form="submitText" class="form-control"
-            placeholder="EG: BCIO:011062 ADDICTO:0000322 - leave blank for full list" name="idList"rows="10">ADDICTO:0000323 ADDICTO:0000322 BCIO:011007 BCIO:011062 BCIO:018000
+            placeholder="Leave blank for full list" name="idList"rows="10">
         </textarea>
         <br>
         <h4>
@@ -211,7 +211,15 @@
           _hidden_field.val(ui.item[_data.item_id]);
           event.preventDefault();
           idResultList.push(ui.item[_data.item_label]);
-          $("#idList").val(idResultList);
+          
+          //append to text box: 
+          var elem = document.getElementById('idList');
+          if(elem.value.trim() == "" || elem.value == null){
+            elem.value += ui.item[_data.item_label];
+          } else{
+            elem.value += (" ," + ui.item[_data.item_label]) ;
+          }
+          
           _this.val(""); //clear input on submit
         }
       })
