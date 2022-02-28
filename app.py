@@ -215,74 +215,93 @@ class OntologyDataStore:
 
         
         all_labels = set()
-        for classIri in self.releases[repo].get_classes():
-            classId = self.releases[repo].get_id_for_iri(classIri).replace(":", "_")
-            for id in allIDS:   
-                if id is not None:         
-                    if classId == id:
-                        label = self.releases[repo].get_annotation(classIri, app.config['RDFSLABEL']) #yes
-                        iri = self.releases[repo].get_iri_for_label(label)
-                        if self.releases[repo].get_annotation(classIri, DEFN) is not None:             
-                            definition = self.releases[repo].get_annotation(classIri, DEFN).replace(",", "").replace("'", "").replace("\"", "")   
-                        else:
-                            definition = ""
-                        if self.releases[repo].get_annotation(classIri, SYN) is not None:
-                            synonyms = self.releases[repo].get_annotation(classIri, SYN).replace(",", "").replace("'", "").replace("\"", "") 
-                        else:
-                            synonyms = ""
-                        entries.append({
-                            "id": id,
-                            "label": label, 
-                            "synonyms": synonyms,
-                            "definition": definition,                      
-                        })
+        try: 
+            for classIri in self.releases[repo].get_classes():
+                classId = self.releases[repo].get_id_for_iri(classIri).replace(":", "_")
+                for id in allIDS:   
+                    if id is not None:         
+                        if classId == id:
+                            label = self.releases[repo].get_annotation(classIri, app.config['RDFSLABEL']) #yes
+                            iri = self.releases[repo].get_iri_for_label(label)
+                            if self.releases[repo].get_annotation(classIri, DEFN) is not None:             
+                                definition = self.releases[repo].get_annotation(classIri, DEFN).replace(",", "").replace("'", "").replace("\"", "")   
+                            else:
+                                definition = ""
+                            if self.releases[repo].get_annotation(classIri, SYN) is not None:
+                                synonyms = self.releases[repo].get_annotation(classIri, SYN).replace(",", "").replace("'", "").replace("\"", "") 
+                            else:
+                                synonyms = ""
+                            entries.append({
+                                "id": id,
+                                "label": label, 
+                                "synonyms": synonyms,
+                                "definition": definition,                      
+                            })
+        except: 
+            pass
         return (entries)
 
-
+    # def getLabelForID(self, repo, ID):
+    #     for classIri in self.releases[repo].get_classes():
+    #     classIri = repo.get_classes()
+    #     label = self.releases[repo].get_annotation(classIri, app.config['RDFSLABEL']) #yes
+    #     return label
 
 ontodb = OntologyDataStore()
 
 #test function from onto-text-tag: 
-# def get_ids(ontol_list):
-#     # print("get_ids running here")
-#     checklist = []
-#     for ontol in [ontol1,ontol2]:
-#         for classIri in ontol.get_classes():
-#             # print("for classIri running")        
-#             classId = ontol.get_id_for_iri(classIri)
-#             label = ontol.get_annotation(classIri, RDFSLABEL)
-#             # label = ontol.get_annotation(classId, RDFSLABEL)
-#             if classId:
-#                 print("got classId and labels") 
-#                 checklist.append(classId + "|"+ label)                   
-#                 print(classId)
-#                 print(label)
+def get_ids(ontol_list):
+    # print("get_ids running here")
+    checklist = []
+    # for ontol in ontol_list:
+    for ontol in [ontol1,ontol2]:
+        for classIri in ontol.get_classes():
+            # print("for classIri running")        
+            label = ontol.get_annotation(classIri, RDFSLABEL)
+            # print("label: ", label) #todo: got labels but no ID, why?
+            # label = ontol.get_annotation(classId, RDFSLABEL)
+            if classIri:                
+                classId = str(classIri).rsplit('/', 1)[1].replace('_', ':').strip()
+                print(classId)
+                if classId and label:
+                    print("got classId and labels") 
+                    checklist.append(classId + "|"+ label)                   
+                    print(classId, ": ", label)
                     
-#     return checklist
+    return checklist
 
 
 @app.route('/')
 @app.route('/home')
 def home():
-    # ontologiesT = ontoDict["ontologies"]
+    ontologiesT = ontoDict["ontologies"]
+    print("ontologiesT: ", ontologiesT)
+    labels = get_ids(ontologiesT) 
+    label_list = labels
+    # print("labels: ", labels)
 
-    # labels = get_ids(ontologiesT) 
     ontologies = ["BCIO", "AddictO"]
-    for repo in ontologies:    #todo: fix this horrible repo repo repos        
-            ontodb.parseRelease(repo)
-    allIds = ontodb.getReleaseIDs(repo)
-    print(allIds)
-    idList = []
-    for ID in allIds: 
-        if ID is not None and ID != "":
-            idList.append(ID.strip())
-    print("idList is: ", idList)
+    # idList = []
+    # for repo in ontologies:    #todo: fix this horrible repo repo repos        
+    #     ontodb.parseRelease(repo)
+    #     allIds = ontodb.getReleaseIDs(repo)
+        # print(allIds)
+        # metaData = ontodb.getMetaData(repo, allIds)
+        # print(metaData)
+
+        # for ID in allIds: 
+        #     if ID is not None and ID != "":
+        #         # label = ontodb.getLabelForID(ID, repo)
+        #         label = "test"
+        #         # idList.append(ID.strip()) #todo: need to append label here also
+        #         idList.append(ID + "|"+ label)  
+        # print("idList is: ", idList)
     # labels = ontodb.getReleaseIDs("BCIO") #todo: support multiple repo's 
     # # labels = get_ids(ontoDict) 
     # label_list={'labels': labels}
     # json.dumps(label_list)
     # print("home label_list is: ", label_list)
-    return render_template("index.html", label_list=idList, ontologies=ontologies) #todo: fix label_list name is incorrect on front end, change when updated in index.html
+    return render_template("index.html", label_list=label_list, ontologies=ontologies) #todo: fix label_list name is incorrect on front end, change when updated in index.html
 
 @app.route('/visualise', methods=['POST'])
 def visualise():
@@ -291,7 +310,10 @@ def visualise():
     if request.method == "POST":
         idString = request.form.get("idList")
         repo = request.form.get("repo")
-        idList = idString.split()
+        idListAll = idString.split(',')
+        print("idListAll: ", idListAll)
+        idList = [str(word).rsplit('|')[0].strip() for word in idListAll]      #todo: remove labels here worked?
+        print("split idList is: ", idList)
         repos = repo.split()
         for repo in repos:    #todo: fix this horrible repo repo repos        
             ontodb.parseRelease(repo) 
