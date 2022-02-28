@@ -88,7 +88,7 @@
 
         if (!loaded) {
             var dotStr = dot;
-            console.log(dotStr.replace(/\s+/g, '').trim());
+            // console.log(dotStr.replace(/\s+/g, '').trim());
             //check for empty digigraph: 
             if(dotStr.replace(/\s+/g, '').trim() == "digraph{}"){
                 console.log("Empty digigraph found");
@@ -118,7 +118,7 @@
                             canvas.height = window.screen.availHeight;
                         }
                     }
-                    console.log("width: " + canvas.width + ", height: " + canvas.height);
+                    // console.log("width: " + canvas.width + ", height: " + canvas.height);
                     if(canvas.width < 10000){
                         context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, img1.width * scale, img1.height * scale);
                     } else{

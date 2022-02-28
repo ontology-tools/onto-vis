@@ -129,7 +129,7 @@
   // console.log("labelJson is: " + labelJson);
   var labelArray = []; //get right format
   var labelList = JSON.parse('{{label_list | tojson | safe}}');
-  console.log("got labelList: ", labelList)
+  // console.log("got labelList: ", labelList)
   var labels = labelList;
   labels.forEach(function (label, i) {
     labelArray.push({ id: i, name: label });
