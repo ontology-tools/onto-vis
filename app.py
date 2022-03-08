@@ -31,29 +31,29 @@ cors = CORS(app, resources={
 
 app.config.from_object('config')
 
-location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
-location2 = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
+#location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
+#location2 = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
 
-print("Fetching release file from", location)
-ontol1 = pyhornedowl.open_ontology(urlopen(location).read().decode('utf-8'))
-print("Fetching release file from", location2)
-ontol2 = pyhornedowl.open_ontology(urlopen(location2).read().decode('utf-8'))
+#print("Fetching release file from", location)
+#ontol1 = pyhornedowl.open_ontology(urlopen(location).read().decode('utf-8'))
+#print("Fetching release file from", location2)
+#ontol2 = pyhornedowl.open_ontology(urlopen(location2).read().decode('utf-8'))
 
-ontoDict = {
-    "ontologies": [       
-        {
-            "label": "BCIO",
-            "name": "BCIO",
-            "ontology": ontol2
-        },
-        
-        {
-            "label": "AddictO",
-             "name": "AddictO",
-            "ontology": ontol1
-        },
-    ]
-}
+#ontoDict = {
+#    "ontologies": [
+#        {
+#            "label": "BCIO",
+#            "name": "BCIO",
+#            "ontology": ontol2
+#        },
+#
+#        {
+#            "label": "AddictO",
+#             "name": "AddictO",
+#            "ontology": ontol1
+#        },
+#    ]
+#}
 
 #github = GitHub(app)
 
@@ -69,6 +69,8 @@ class OntologyDataStore:
         self.releasedates = {}
         self.label_to_id = {}
         self.graphs = {}
+        for repo in app.config["REPOSITORIES"]:
+            self.parseRelease(repo)
 
     def parseRelease(self,repo):
         # Keep track of when you parsed this release
@@ -248,7 +250,8 @@ def get_ids(ontol_list):
     # print("get_ids running here")
     checklist = []
     # for ontol in ontol_list:
-    for ontol in [ontol1,ontol2]:
+    for repo in app.config['REPOSITORIES']:
+        ontol = ontodb.releases[repo]
         for classIri in ontol.get_classes():
             # print("for classIri running")        
             label = ontol.get_annotation(classIri, RDFSLABEL)
@@ -268,7 +271,7 @@ def get_ids(ontol_list):
 @app.route('/')
 @app.route('/home')
 def home():
-    ontologies_for_list = ontoDict["ontologies"]
+    ontologies_for_list = app.config["RELEASE_FILES"].keys()
     # print("ontologies_for_list: ", ontologies_for_list)
     labels = get_ids(ontologies_for_list) 
     label_list = labels
@@ -287,8 +290,8 @@ def visualise():
         idList = [str(word).rsplit('|')[0].strip() for word in idListAll]      
         # print("split idList is: ", idList)
         repos = repo.split()
-        for repo in repos:    #todo: fix this horrible repo repo repos        
-            ontodb.parseRelease(repo) 
+        #for repo in repos:    #todo: fix this horrible repo repo repos
+        #    ontodb.parseRelease(repo)
         if len(idList) < 1 or (len(idList) == 1 and idList[0] == ""):
             # print("got zero length idList")
             allIds = ontodb.getReleaseIDs(repo)
