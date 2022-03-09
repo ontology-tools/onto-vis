@@ -12,9 +12,9 @@ import threading
 
 import json
 
-import whoosh
-from whoosh.qparser import MultifieldParser,QueryParser
-from datetime import date
+#import whoosh
+#from whoosh.qparser import MultifieldParser,QueryParser
+#from datetime import date
 
 from urllib.request import urlopen
 
