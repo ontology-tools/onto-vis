@@ -1,9 +1,9 @@
 import os
 
 # Connect to the Google cloud Secret Manager client
-from google.cloud import secretmanager
+#from google.cloud import secretmanager
 # Connect to Google cloud storage client
-from google.cloud import storage
+#from google.cloud import storage
 
 DEBUG = True
 
