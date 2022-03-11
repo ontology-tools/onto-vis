@@ -286,16 +286,17 @@ def visualise():
         idString = request.form.get("idList")
         repo = request.form.get("repo")
         idListAll = idString.split(',')
-        print("idListAll: ", idListAll)
+        # print("idListAll: ", idListAll)
         idList = [str(word).rsplit('|')[0].strip() for word in idListAll]      
-        print("split idList is: ", idList)
+        # print("split idList is: ", idList)
         repos = repo.split()
        
-        for repo in repos:
-            if len(idList) < 1 or (len(idList) == 1 and idList[0] == ""):
-                print("got zero length idList")
-                allIds = ontodb.getReleaseIDs(repo)
-                print(allIds)
+
+        if len(idList) < 1 or (len(idList) == 1 and idList[0] == ""):
+            for one_repo in repos:
+                # print("got zero length idList")
+                allIds = ontodb.getReleaseIDs(one_repo)
+                # print(allIds)
                 idList = []
                 for ID in allIds: 
                     if ID is not None and ID != "":
