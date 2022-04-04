@@ -96,14 +96,21 @@
     action="/visualise" onsubmit="return required()">
     
         <h4>
-            <span class="badge badge-primary">
-                List of ID's separated by commas
+            <span class="badge badge-secondary">
+                List of ID's (separated by commas)
             </span>
         </h4>
         <textarea id="idList" form="submitText" class="form-control" placeholder="Leave blank for full list" name="idList"rows="10"></textarea>
         <br>
         <h4>
-            <span class="badge badge-primary" placeholder="EG: AddictO BCIO">
+          <span class="badge badge-secondary">
+              ID's to exclude (separated by commas)
+          </span>
+      </h4>
+      <textarea id="excludeIDList" form="submitText" class="form-control" name="excludeIDList"rows="3"></textarea>
+      <br>        
+        <h4>
+            <span class="badge badge-secondary" placeholder="EG: AddictO BCIO">
                 Choice of Ontologies
             </span>
         </h4>

@@ -280,15 +280,27 @@ def home():
 
 @app.route('/visualise', methods=['POST'])
 def visualise():
-    # print("open called")
+    print("open called")
     #build data we need for dotStr query (new one!)
     if request.method == "POST":
         idString = request.form.get("idList")
+        excludeIDString = request.form.get("excludeIDList")
+        print("got excludeIDString: ", excludeIDString)
         repo = request.form.get("repo")
         idListAll = idString.split(',')
+        excludeIDListAll = excludeIDString.split(',')
         # print("idListAll: ", idListAll)
-        idList = [str(word).rsplit('|')[0].strip() for word in idListAll]      
-        # print("split idList is: ", idList)
+        idListFull = [str(word).rsplit('|')[0].strip() for word in idListAll]      
+        # print("split idList is: ", idListFull)
+        excludeIDList = [str(word).rsplit('|')[0].strip() for word in excludeIDListAll]  
+        # excludeIDList = ['BCIO:043000'] #test value - todo: get this from the front end
+
+        # print("idlistFull is: ", idListFull)
+        if len(excludeIDList) < 1 or (len(excludeIDList) == 1 and excludeIDList[0] == ""): 
+            idList = idListFull 
+        else:
+            idList = list(set(idListFull) - set(excludeIDList)) # exclude some ID's        
+        # print("idList after exclude: ", idList)
         repos = repo.split()
        
 
