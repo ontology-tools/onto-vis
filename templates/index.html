@@ -69,27 +69,6 @@
     Input a list of ID's below, choose your Ontology, then press "Submit":
 </h2>
 
-<div class="container">
-    <!-- <h1>jQuery UI autocomplete for Bootstrap</h1>
-      <p>Demo version with local data.</p> -->
-    <div class="row">
-      <div class="col-md-12">
-        <div class="form-group">
-          <!-- <label for="ac-demo" class="control-label">Look up ID's here:</label>
-          <input class="form-control bs-autocomplete" id="ac-demo" value="" placeholder="ID or Label..." type="text"
-            data-source="demo_source.php" data-hidden_field_id="city-code" data-item_id="id" data-item_label="name"
-            autocomplete="off"> -->
-        </div>
-      </div>
-      <div class="col-xs-3">
-        <!-- <div class="form-group">
-          <input class="form-control" id="city-code" name="citycode" value="" type="number" readonly>
-        </div> -->
-      </div>
-    </div>
-  </div>
-  
-
 <div id="form_div" style="text-align: center;">    
     <form  target=”_blank” id="submitText" name="form" method="POST" style="text-align: center;"
     action="/visualise" onsubmit="return required()">
@@ -108,13 +87,13 @@
     <div class="container">
       <div class="row">
         <div class="col">
-          <label for="ac-demo" class="control-label">Look up ID's here:</label>
-          <input class="form-control bs-autocomplete" id="ac-demo" value="" placeholder="ID or Label..." type="text"
-            data-source="demo_source.php" data-hidden_field_id="city-code" data-item_id="id" data-item_label="name"
+          <label for="search-replace" class="control-label">Look up ID's here:</label>
+          <input class="form-control bs-autocomplete" id="search-replace" value="" placeholder="ID or Label..." type="text"
+            data-source="demo_source.php" data-hidden_field_id="id-or-label" data-item_id="id" data-item_label="name"
             autocomplete="off">
 
           <div class="form-group">
-            <input class="form-control" id="city-code" name="citycode" value="" type="number" readonly>
+            <input class="form-control" id="id-or-label" name="idlabel" value="" type="number" readonly>
           </div>
         <h4>
             <span class="badge badge-secondary">
@@ -123,7 +102,17 @@
         </h4>
         <textarea id="idList" form="submitText" class="form-control" placeholder="" name="idList"rows="10"></textarea>
         </div>
+
+
         <div class="col">
+        <label for="search-replace" class="control-label">Look up Exclude ID's here:</label>
+        <input class="form-control bs-autocomplete2" id="search-replace" value="" placeholder="ID or Label..." type="text"
+          data-source="demo_source.php" data-hidden_field_id="id-or-label2" data-item_id="id" data-item_label="name"
+          autocomplete="off">
+
+        <div class="form-group">
+          <input class="form-control" id="id-or-label2" name="idlabel2" value="" type="number" readonly>
+        </div>
           <h4>
             <span class="badge badge-secondary">
                 ID's to exclude (separated by commas)
@@ -159,7 +148,7 @@
     // console.log("got label: " + label);
   });
 
-  //test jQuery UI:
+  //jQuery UI:
   $.widget("ui.autocomplete", $.ui.autocomplete, {
 
     _renderMenu: function (ul, items) {
@@ -184,10 +173,6 @@
 
   (function () {
     "use strict";
-
-
-
-
     $('.bs-autocomplete').each(function () {
       var _this = $(this),
         _data = _this.data(),
@@ -234,7 +219,74 @@
           idResultList.push(ui.item[_data.item_label]);
           
           //append to text box: 
-          var elem = document.getElementById('idList');
+          var elem = document.getElementById('idList'); //todo: use text box below instead?
+          if(elem.value.trim() == "" || elem.value == null){
+            elem.value += ui.item[_data.item_label];
+          } else{
+            elem.value += (" ," + ui.item[_data.item_label]) ;
+          }
+          
+          _this.val(""); //clear input on submit
+        }
+      })
+        .data('ui-autocomplete')._renderItem = function (ul, item) {
+          return $('<li></li>')
+            .data("item.autocomplete", item)
+            .append('<a>' + item[_data.item_label] + '</a>')
+            .append('<br>')
+            .appendTo(ul);
+        };
+      // end autocomplete
+    });
+
+    //other autocomplete: 
+    $('.bs-autocomplete2').each(function () {
+      var _this = $(this),
+        _data = _this.data(),
+        _hidden_field = $('#' + _data.hidden_field_id);
+      _hidden_field.hide();
+
+      _this.after('<div class="bs-autocomplete-feedback form-control-feedback"><div class="loader">Loading...</div></div>')
+        .parent('.form-group').addClass('has-feedback');
+
+      var feedback_icon = _this.next('.bs-autocomplete-feedback');
+      feedback_icon.hide();
+
+      _this.autocomplete({
+        minLength: 2,
+        autoFocus: false,
+
+        source: function (request, response) {
+          var _regexp = new RegExp(request.term, 'i');
+          var data = labelArray.filter(function (item) {
+            // console.log("item is: ", item);
+            return item.name.match(_regexp);
+          });
+          response(data);
+        },
+
+        search: function () {
+          feedback_icon.show();
+          _hidden_field.val('');
+        },
+
+        response: function () {
+          feedback_icon.hide();
+        },
+
+        focus: function (event, ui) {
+          _this.val(ui.item[_data.item_label]);
+          event.preventDefault();
+        },
+
+        select: function (event, ui) {
+          _this.val(ui.item[_data.item_label]);
+          _hidden_field.val(ui.item[_data.item_id]);
+          event.preventDefault();
+          idResultList.push(ui.item[_data.item_label]);
+          
+          //append to text box: 
+          var elem = document.getElementById('excludeIDList'); //todo: use text box below instead?
           if(elem.value.trim() == "" || elem.value == null){
             elem.value += ui.item[_data.item_label];
           } else{
