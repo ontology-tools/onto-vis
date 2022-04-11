@@ -145,11 +145,15 @@ class OntologyDataStore:
             all_labels.add(self.releases[repo].get_annotation(classIri, app.config['RDFSLABEL']))
         return( all_labels )
     
-    def getReleaseIDs(self, repo):
+    def getReleaseIDs(self, repo, excludes):
         all_IDs = set()
         for classIri in self.releases[repo].get_classes():
             classId = self.releases[repo].get_id_for_iri(classIri)
             all_IDs.add(classId)
+        if len(excludes) < 1 or (len(excludes) == 1 and excludes[0] == ""): 
+            all_IDs = all_IDs
+        else:
+            all_IDs = list(set(all_IDs) - set(excludes)) # exclude some ID's 
         return( all_IDs )
 
     def getRelatedIDs(self, repo, selectedIds):
@@ -186,12 +190,19 @@ class OntologyDataStore:
                 pass
         return (ids)
 
-    def getDotForMultipleIDs(self, repos, selectedIds):
+    def getDotForMultipleIDs(self, repos, selectedIds, excludes):
         # Add all descendents of the selected IDs, the IDs and their parents.
         if len(repos) > 1:
             subgraphs = []
             for repo in repos: 
                 ids = OntologyDataStore.getRelatedIDs(self, repo, selectedIds) 
+                if len(excludes) < 1 or (len(excludes) == 1 and excludes[0] == ""): 
+                    ids = ids
+                    print("not excluding anything")
+                else:
+                    ids = list(set(ids) - set(excludes)) # exclude some ID's 
+                print("Should exclude: ", excludes)
+                print("ids after exclude: ", ids)
                 subgraphs.append(self.graphs[repo].subgraph(ids))
             #test combine two graphs:
             F = networkx.compose_all(subgraphs)
@@ -200,6 +211,13 @@ class OntologyDataStore:
             return (P)   
         else:              
             ids = OntologyDataStore.getRelatedIDs(self, repos[0], selectedIds) 
+            if len(excludes) < 1 or (len(excludes) == 1 and excludes[0] == ""): 
+                print("not excluding anything")
+                ids = ids
+            else:
+                ids = list(set(ids) - set(excludes)) # exclude some ID's 
+            print("Should exclude: ", excludes)
+            print("ids after exclude: ", ids)
             subgraph = self.graphs[repos[0]].subgraph(ids)            
             P = networkx.nx_pydot.to_pydot(subgraph)
             return (P)   
@@ -306,14 +324,15 @@ def visualise():
         if len(idList) < 1 or (len(idList) == 1 and idList[0] == ""):
             for one_repo in repos:
                 # print("got zero length idList")
-                allIds = ontodb.getReleaseIDs(one_repo)
+                allIds = ontodb.getReleaseIDs(one_repo, excludeIDList) 
                 # print(allIds)
                 idList = []
                 for ID in allIds: 
                     if ID is not None and ID != "":
                         idList.append(ID.strip())
         
-        dotStr = ontodb.getDotForMultipleIDs(repos,idList).to_string()
+        excludeIDListUnderscore = [s.replace(":", "_") for s in excludeIDList]
+        dotStr = ontodb.getDotForMultipleIDs(repos, idList, excludeIDListUnderscore).to_string()
 
         #NOTE: APP_TITLE2 can't be blank - messes up the spacing  
         APP_TITLE2 = "VISUALISATION" 
