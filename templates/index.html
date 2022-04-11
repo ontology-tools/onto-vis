@@ -75,17 +75,16 @@
     <div class="row">
       <div class="col-md-12">
         <div class="form-group">
-          <label for="ac-demo" class="control-label">Look up ID's here:</label>
+          <!-- <label for="ac-demo" class="control-label">Look up ID's here:</label>
           <input class="form-control bs-autocomplete" id="ac-demo" value="" placeholder="ID or Label..." type="text"
             data-source="demo_source.php" data-hidden_field_id="city-code" data-item_id="id" data-item_label="name"
-            autocomplete="off">
+            autocomplete="off"> -->
         </div>
       </div>
       <div class="col-xs-3">
-        <div class="form-group">
+        <!-- <div class="form-group">
           <input class="form-control" id="city-code" name="citycode" value="" type="number" readonly>
-          <!--todo: what is readonly for?-->
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -94,9 +93,29 @@
 <div id="form_div" style="text-align: center;">    
     <form  target=”_blank” id="submitText" name="form" method="POST" style="text-align: center;"
     action="/visualise" onsubmit="return required()">
+    
+    <h4>
+      <span class="badge badge-secondary" placeholder="EG: AddictO BCIO">
+          Choice of Ontologies
+      </span>
+  </h4>
+  
+  {% for ont in ontologies %}
+  <input id="{{ont}}" type="checkbox" name="{{ont}}" value="{{ont}}">{{ont}}
+  {% endfor %}
+  <input id="repo-text-box" name="repo" value="" hidden="true">
+
     <div class="container">
       <div class="row">
         <div class="col">
+          <label for="ac-demo" class="control-label">Look up ID's here:</label>
+          <input class="form-control bs-autocomplete" id="ac-demo" value="" placeholder="ID or Label..." type="text"
+            data-source="demo_source.php" data-hidden_field_id="city-code" data-item_id="id" data-item_label="name"
+            autocomplete="off">
+
+          <div class="form-group">
+            <input class="form-control" id="city-code" name="citycode" value="" type="number" readonly>
+          </div>
         <h4>
             <span class="badge badge-secondary">
                 List of ID's (separated by commas)
@@ -112,16 +131,7 @@
           </h4>
           <textarea id="excludeIDList" form="submitText" class="form-control" name="excludeIDList"rows="3"></textarea>
              <br>
-        <h4>
-            <span class="badge badge-secondary" placeholder="EG: AddictO BCIO">
-                Choice of Ontologies
-            </span>
-        </h4>
         
-        {% for ont in ontologies %}
-        <input id="{{ont}}" type="checkbox" name="{{ont}}" value="{{ont}}">{{ont}}
-        {% endfor %}
-        <input id="repo-text-box" name="repo" value="" hidden="true">
         <input class="btn btn-outline-primary" type="submit" value="Submit">
       </div> 
      </div>
