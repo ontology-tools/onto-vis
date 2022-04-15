@@ -285,16 +285,55 @@ def get_ids(ontol_list):
                     
     return checklist
 
+#function from onto-text-tag: 
+def get_ids_for_one(current_ontol):
+    # print("get_ids running here")
+    checklist = []
+    # for ontol in ontol_list:
+    # for repo in app.config['REPOSITORIES']:
+    ontol = ontodb.releases[current_ontol]
+    for classIri in ontol.get_classes():
+        # print("for classIri running")        
+        label = ontol.get_annotation(classIri, RDFSLABEL)
+        # print("label: ", label) 
+        # label = ontol.get_annotation(classId, RDFSLABEL)
+        if classIri:                
+            classId = str(classIri).rsplit('/', 1)[1].replace('_', ':').strip()
+            # print(classId)
+            if classId and label:
+                # print("got classId and labels") 
+                checklist.append(classId + "|"+ label)                   
+                # print(classId, ": ", label)
+                    
+    return checklist
 
 @app.route('/')
 @app.route('/home')
 def home():
-    ontologies_for_list = app.config["RELEASE_FILES"].keys()
+    ontologies_for_list = app.config["RELEASE_FILES"].keys() #todo: get these from BSSOFoundry
     # print("ontologies_for_list: ", ontologies_for_list)
-    labels = get_ids(ontologies_for_list) 
+    labels = get_ids(ontologies_for_list) #todo: this into [][] 
     label_list = labels
-    ontologies = ["BCIO", "AddictO"]
-    return render_template("index.html", label_list=label_list, ontologies=ontologies) 
+    ontologies = ["BCIO", "AddictO"] #todo: get these from BSSOFoundry
+    #label_list_two test: 
+    
+    label_list_two = [["a", "b", "c"], ["d", "e", "f"]] #this is fine..
+
+    return render_template("index.html", label_list=label_list, ontologies=ontologies, label_list_two=label_list_two) 
+
+@app.route('/get_values', methods=['POST', 'GET'])
+def get_values():
+    current_ontology=request.form.get("ontology") #todo: replace ontologies_for_list with this from front end..
+    print("got request for current_ontology: ", current_ontology)
+
+    # ontologies_for_list = app.config["RELEASE_FILES"].keys() #todo: get these from BSSOFoundry
+    # print("ontologies_for_list: ", ontologies_for_list)
+
+    labels = get_ids_for_one(current_ontology)
+    # print("got labels in /get_values: ", labels)
+    print("size of labels: ", len(labels))
+    label_list = ["a", "b", "c"] #test values
+    return jsonify(label_list)
 
 @app.route('/visualise', methods=['POST'])
 def visualise():

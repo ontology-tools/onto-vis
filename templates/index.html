@@ -134,8 +134,8 @@
 <script>
     //ID complete functions from onto-text-tag
      $(function () {
-    $('[data-toggle="popover"]').popover({ html: true });
-  })
+      $('[data-toggle="popover"]').popover({ html: true });
+    })
 
   var ontologyArray = [];
   var idResultList = [];
@@ -149,6 +149,40 @@
     labelArray.push({ id: i, name: label });
     // console.log("got label: " + label);
   });
+
+//multi label list: 
+var labelArrayTwo = [];
+
+
+$('input[type="checkbox"]').click(function() {
+    // alert ("The element with id " + this.id + " changed.");
+    ontologyValues = ""
+    {% for ont in ontologies %}
+    if($('#{{ont}}').get(0).checked){
+      $.ajax({
+      'url' : '/get_values',    
+      'type' : 'POST',    
+      'data' : {
+        'ontology' : '{{ont}}', 
+      },    
+      'success' : function(data) {      
+        console.log(data);
+        data.forEach(function (label, i) {
+          labelArrayTwo.push({ id: i, name: label }); //todo: works but is not named, so not very useful
+          console.log("got label_two: " + label);
+        });       
+      }
+      
+      
+    });
+      
+  });
+  {% endfor %}
+});
+    
+    
+      
+
 
   //jQuery UI:
   $.widget("ui.autocomplete", $.ui.autocomplete, {
@@ -318,7 +352,30 @@ function required(){
         ontologyValues = ""
         {% for ont in ontologies %}
         if($('#{{ont}}').get(0).checked){
-            ontologyValues = ontologyValues + "{{ont}}" + " ";
+            ontologyValues = ontologyValues + "{{ont}}" + " "; 
+            //todo: get ontology labels here from /get_values
+            //Send the AJAX call to the server
+          // $.ajax({
+          // //The URL to process the request
+          //   'url' : '/get_values',
+          // //The type of request, also known as the "method" in HTML forms
+          // //Can be 'GET' or 'POST'
+          //   'type' : 'POST',
+          // //Any post-data/get-data parameters
+          // //This is optional
+          //   'data' : {
+          //     'ontology' : 'BCIO', //todo: get from checkboxes!
+          //   },
+          // //The response from the server
+          //   'success' : function(data) {
+          //   //You can use any jQuery/JavaScript here!!!
+          //     console.log(data);
+          //     // if (data == "success") {
+          //     //   alert('request sent!');
+          //     // }
+          //   }
+          // });
+
         }
         {% endfor %}
         // console.log("got ontologyValues: " + ontologyValues);
