@@ -64,7 +64,25 @@
 
 <meta charset="utf-8">
 <br>
-
+<!-- Modal -->
+<div class="modal fade" id="alertBox" tabindex="-1" role="dialog" aria-labelledby="alertBoxLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="alertBoxLabel">No Ontology chosen</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Please select one or more of the checkboxes
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 <h2 style="text-align: center;">
     Input a list of ID's below, choose your Ontology, then press "Submit":
 </h2>
@@ -359,8 +377,9 @@ $('input[type="checkbox"]').click(function() {
           }
           {% endfor %}        
         
-          if (ontologyValues == "") {            
-          alert("Please choose an Ontology");
+          if (ontologyValues == "") {   
+            $('#alertBox').modal();    
+          // alert("Please choose an Ontology");
           }
         });
 
@@ -373,7 +392,8 @@ $('input[type="checkbox"]').click(function() {
           {% endfor %}        
         
           if (ontologyValues == "") {            
-          alert("Please choose an Ontology");
+          // alert("Please choose an Ontology");
+          $('#alertBox').modal();
           }
         });
 
@@ -386,7 +406,8 @@ $('input[type="checkbox"]').click(function() {
           {% endfor %}        
         
           if (ontologyValues == "") {            
-          alert("Please choose an Ontology");
+          // alert("Please choose an Ontology");
+          $('#alertBox').modal();
           }
         });
 
@@ -399,7 +420,8 @@ $('input[type="checkbox"]').click(function() {
           {% endfor %}        
         
           if (ontologyValues == "") {            
-          alert("Please choose an Ontology");
+          // alert("Please choose an Ontology");
+          $('#alertBox').modal();
           }
         });
 
@@ -415,7 +437,8 @@ function required(){
         $('#repo-text-box').val(ontologyValues);
         
         if (ontologyValues == "") {            
-        alert("Please choose an Ontology");
+        // alert("Please choose an Ontology");
+        $('#alertBox').modal();
         return false;
         }
         else {
