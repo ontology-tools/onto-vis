@@ -1,3 +1,4 @@
+from cProfile import label
 from flask import Flask, request, g, session, redirect, url_for, render_template
 from flask import render_template_string, jsonify, Response, send_file
 from flask_cors import CORS
@@ -332,7 +333,8 @@ def get_values():
     labels = get_ids_for_one(current_ontology)
     # print("got labels in /get_values: ", labels)
     print("size of labels: ", len(labels))
-    label_list = ["a", "b", "c"] #test values
+    label_list = labels
+    # label_list = ["a", "b", "c"] #test values
     return jsonify(label_list)
 
 @app.route('/visualise', methods=['POST'])
