@@ -137,16 +137,15 @@
       $('[data-toggle="popover"]').popover({ html: true });
     })
 
-    function updateLabels(){ //todo: syntax errors in this function here..??? Fix!
-        // alert ("The element with id " + this.id + " changed.");
+    function updateLabels(){ 
         labelArray = [];
       ontologyValues = "";
       {% for ont in ontologies %}
       var checkedOnt = '{{ont}}';
       checkedOnt = "#" + checkedOnt;
-      console.log(checkedOnt);
+      // console.log(checkedOnt);
       if ($(checkedOnt).is(':checked')){
-        console.log("checked");
+        // console.log("checked");
       
         $.ajax({
         'url' : '/get_values',    
@@ -155,10 +154,10 @@
           'ontology' : '{{ont}}'
         },    
         'success' : function(data) {      
-          console.log(data);
+          // console.log(data);
           data.forEach(function (label, i) {
-            labelArray.push({ id: i, name: label }); //todo: works but is not named, so not very useful
-            console.log("got label_two: " + label);
+            labelArray.push({ id: i, name: label }); 
+            // console.log("got label_two: " + label);
           });       
         }    
         
@@ -170,18 +169,14 @@
   var ontologyArray = [];
   var idResultList = [];
   var labelJson = '{{label_list | tojson | safe}}';
-  // console.log("labelJson is: " + labelJson);
   var labelArray = []; //get right format
   var labelList = JSON.parse('{{label_list | tojson | safe}}');
   // console.log("got labelList: ", labelList)
   var labels = labelList;
   labels.forEach(function (label, i) {
     labelArray.push({ id: i, name: label });
-    // console.log("got label: " + label);
   });
 
-//multi label list - todo: trying to replace labelArray here with dynamic label list defined by checkbox values: 
-// var labelArrayTwo = [];
 
 
 $('input[type="checkbox"]').click(function() {
@@ -357,47 +352,14 @@ $('input[type="checkbox"]').click(function() {
     });
 
 function required(){
-        ontologyValues = ""
-        {% for ont in ontologies %}
-        if($('#{{ont}}').get(0).checked){
-          ontologyValues = ontologyValues + "{{ont}}" + " "; 
-
-            
-            //Send the AJAX call to the server
-          // $.ajax({
-          // //The URL to process the request
-          //   'url' : '/get_values',
-          // //The type of request, also known as the "method" in HTML forms
-          // //Can be 'GET' or 'POST'
-          //   'type' : 'POST',
-          // //Any post-data/get-data parameters
-          // //This is optional
-          //   'data' : {
-          //     'ontology' : 'BCIO', //todo: get from checkboxes!
-          //   },
-          // //The response from the server
-          //   'success' : function(data) {
-          //   //You can use any jQuery/JavaScript here!!!
-          //     console.log(data);
-          //     // if (data == "success") {
-          //     //   alert('request sent!');
-          //     // }
-          //   }
-          // });
-
-        }
-        {% endfor %}
-        // console.log("got ontologyValues: " + ontologyValues);
+        
         $('#repo-text-box').val(ontologyValues);
-        // console.log("got ontologyValues: " + $('#repo-text-box').val());
-
         
         if (ontologyValues == "") {            
         alert("Please choose an Ontology");
         return false;
         }
         else {
-        // alert('Code has accepted : you can try another');
         return true; 
         }
 

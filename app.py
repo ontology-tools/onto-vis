@@ -324,15 +324,15 @@ def home():
 
 @app.route('/get_values', methods=['POST', 'GET'])
 def get_values():
-    current_ontology=request.form.get("ontology") #todo: replace ontologies_for_list with this from front end..
-    print("got request for current_ontology: ", current_ontology)
+    current_ontology=request.form.get("ontology") 
+    # print("got request for current_ontology: ", current_ontology)
 
     # ontologies_for_list = app.config["RELEASE_FILES"].keys() #todo: get these from BSSOFoundry
     # print("ontologies_for_list: ", ontologies_for_list)
 
     labels = get_ids_for_one(current_ontology)
     # print("got labels in /get_values: ", labels)
-    print("size of labels: ", len(labels))
+    # print("size of labels: ", len(labels))
     label_list = labels
     # label_list = ["a", "b", "c"] #test values
     return jsonify(label_list)
