@@ -106,7 +106,7 @@
 
 
         <div class="col">
-          <label for="search-replace2" class="control-label">Look up Exclude ID's here:</label>
+          <label for="search-replace2" class="control-label">Look up ID's to exclude here:</label>
           <input class="form-control bs-autocomplete2" id="search-replace2" value="" placeholder="ID or Label..." type="text"
             data-source="demo_source.php" data-hidden_field_id="id-or-label2" data-item_id="id" data-item_label="name"
             autocomplete="off">
@@ -352,7 +352,12 @@ $('input[type="checkbox"]').click(function() {
     });
 
 function required(){
-        
+        ontologyValues = ""
+        {% for ont in ontologies %}
+          if($('#{{ont}}').get(0).checked){
+            ontologyValues = ontologyValues + "{{ont}}" + " "; 
+          }
+        {% endfor %}        
         $('#repo-text-box').val(ontologyValues);
         
         if (ontologyValues == "") {            
