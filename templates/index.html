@@ -183,7 +183,8 @@ $('input[type="checkbox"]').click(function() {
    updateLabels();
 });
     
-    
+
+
       
 
 
@@ -211,6 +212,8 @@ $('input[type="checkbox"]').click(function() {
   });
 
   (function () {
+
+
     "use strict";
     $('.bs-autocomplete').each(function () {
       var _this = $(this),
@@ -348,11 +351,62 @@ $('input[type="checkbox"]').click(function() {
 
     $(document).ready(function() {
         // alert("loaded");
+        $('#search-replace').focusin(function() {
+          ontologyValues = "";
+          {% for ont in ontologies %}
+          if($('#{{ont}}').get(0).checked){
+            ontologyValues = ontologyValues + "{{ont}}" + " "; 
+          }
+          {% endfor %}        
         
+          if (ontologyValues == "") {            
+          alert("Please choose an Ontology");
+          }
+        });
+
+        $('#search-replace2').focusin(function() {
+          ontologyValues = "";
+          {% for ont in ontologies %}
+          if($('#{{ont}}').get(0).checked){
+            ontologyValues = ontologyValues + "{{ont}}" + " "; 
+          }
+          {% endfor %}        
+        
+          if (ontologyValues == "") {            
+          alert("Please choose an Ontology");
+          }
+        });
+
+        $('#idList').focusin(function() {
+          ontologyValues = "";
+          {% for ont in ontologies %}
+          if($('#{{ont}}').get(0).checked){
+            ontologyValues = ontologyValues + "{{ont}}" + " "; 
+          }
+          {% endfor %}        
+        
+          if (ontologyValues == "") {            
+          alert("Please choose an Ontology");
+          }
+        });
+
+        $('#excludeIDList').focusin(function() {
+          ontologyValues = "";
+          {% for ont in ontologies %}
+          if($('#{{ont}}').get(0).checked){
+            ontologyValues = ontologyValues + "{{ont}}" + " "; 
+          }
+          {% endfor %}        
+        
+          if (ontologyValues == "") {            
+          alert("Please choose an Ontology");
+          }
+        });
+
     });
 
 function required(){
-        ontologyValues = ""
+        ontologyValues = "";
         {% for ont in ontologies %}
           if($('#{{ont}}').get(0).checked){
             ontologyValues = ontologyValues + "{{ont}}" + " "; 
