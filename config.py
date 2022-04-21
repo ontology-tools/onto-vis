@@ -17,10 +17,10 @@ DATABASE_URI = 'sqlite:////tmp/github-flask-ontospreaded.db'
 RELEASE_FILES = {"AddictO": "addicto-merged.owx",
                  "BCIO": "Upper%20Level%20BCIO/bcio-merged.owx"}
 
-OWL_LOCATIONS = {"AddictO": " http://purl.obolibrary.org/obo/addicto.owl",
-                 "BCIO": " http://purl.obolibrary.org/obo/bcio.owl",
-                 "MF": " http://purl.obolibrary.org/obo/mf.owl",
-                 "MFOEM": " http://purl.obolibrary.org/obo/mfoem.owl"}
+OWL_LOCATIONS = {"AddictO": "http://purl.obolibrary.org/obo/addicto.owl",
+                 "BCIO": "http://purl.obolibrary.org/obo/bcio.owl",
+                 "MF": "http://purl.obolibrary.org/obo/mf.owl",
+                 "MFOEM": "http://purl.obolibrary.org/obo/mfoem.owl"}
 
 PREFIXES = [ ["ADDICTO","http://addictovocab.org/ADDICTO_"],
              ["BFO","http://purl.obolibrary.org/obo/BFO_"],
