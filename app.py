@@ -32,6 +32,33 @@ cors = CORS(app, resources={
 
 app.config.from_object('config')
 
+#get source repositories: 
+query_url = f"https://api.github.com/repos/bssofoundry/bssofoundry.github.io/contents/ontology?ref=main"
+
+headers = {'Accept': f'application/vnd.github.v3+json'}
+r = requests.get(query_url, headers=headers)
+linksData = r.json()
+source_urls = []
+requests_source = {}
+
+for result in linksData:
+    download_url = result['download_url']
+    if "_outline" in download_url:
+        pass
+    else:
+        md_html = requests.get(download_url, headers=headers).text
+        # print(md_html) #full result for testing
+        for line in md_html.split('\n'):
+            if "source_url: " in line: 
+                source_url = line.replace("source_url: ", "").strip()
+                source_urls.append(source_url)
+        for result in source_urls: 
+            id = result.rsplit("/", 1)[1].replace(".owl", "").upper()
+            requests_source[id] = result
+print("requests_source: ", requests_source)
+
+
+
 #location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
 #location2 = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
 
@@ -80,6 +107,7 @@ class OntologyDataStore:
         #print("Release date ",self.releasedates[repo])
 
         # Get the ontology from the repository
+        #todo: get ontofilename, repositories and repo_detail from BSSOFoundry
         ontofilename = app.config['RELEASE_FILES'][repo]
         repositories = app.config['REPOSITORIES']
         repo_detail = repositories[repo]
