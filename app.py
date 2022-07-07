@@ -227,11 +227,11 @@ class OntologyDataStore:
                 ids = OntologyDataStore.getRelatedIDs(self, repo, selectedIds) 
                 if len(excludes) < 1 or (len(excludes) == 1 and excludes[0] == ""): 
                     ids = ids
-                    print("not excluding anything")
+                    # print("not excluding anything")
                 else:
                     ids = list(set(ids) - set(excludes)) # exclude some ID's 
-                print("Should exclude: ", excludes)
-                print("ids after exclude: ", ids)
+                # print("Should exclude: ", excludes)
+                # print("ids after exclude: ", ids)
                 subgraphs.append(self.graphs[repo].subgraph(ids))
             #test combine two graphs:
             F = networkx.compose_all(subgraphs)
@@ -241,12 +241,12 @@ class OntologyDataStore:
         else:              
             ids = OntologyDataStore.getRelatedIDs(self, repos[0], selectedIds) 
             if len(excludes) < 1 or (len(excludes) == 1 and excludes[0] == ""): 
-                print("not excluding anything")
+                # print("not excluding anything")
                 ids = ids
             else:
                 ids = list(set(ids) - set(excludes)) # exclude some ID's 
-            print("Should exclude: ", excludes)
-            print("ids after exclude: ", ids)
+            # print("Should exclude: ", excludes)
+            # print("ids after exclude: ", ids)
             subgraph = self.graphs[repos[0]].subgraph(ids)            
             P = networkx.nx_pydot.to_pydot(subgraph)
             return (P)   
