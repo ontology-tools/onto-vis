@@ -58,16 +58,16 @@ for result in linksData:
         for line in md_html.split('\n'):
             if "id: " in line and "- id: " not in line and "orcid" not in line:
                 repo_name = line.replace("id: ", "").strip().upper() #todo: not .upper?? 
-                if repo_name != "ADDICTO":      
-                    repo_names.append(repo_name)
-                else: 
-                    repo_names.append("AddictO") # work-around for non-upper AddictO: todo: fix this!
+                # if repo_name != "ADDICTO":      
+                repo_names.append(repo_name)
+                # else: 
+                #     repo_names.append("AddictO") # work-around for non-upper AddictO: todo: fix this!
         # work-around for non-upper AddictO: todo: fix this!
         if repo_name != "ADDICTO":
             source_repositories[repo_name] = source_url
         else: 
             #todo: url for AddictO not resolving - 
-            source_repositories['AddictO'] = "https://raw.githubusercontent.com/addiction-ssa/addiction-ontology/master/addicto.owl" # source_url # todo: make this kluge exception for AddictO go away
+            source_repositories['ADDICTO'] = "https://raw.githubusercontent.com/addiction-ssa/addiction-ontology/master/addicto.owl" # source_url # todo: make this kluge exception for AddictO go away
 
 print("source_repositories: ", source_repositories)
 
@@ -117,79 +117,79 @@ class OntologyDataStore:
         #     self.parseRelease(repo)
 
     def parseRelease(self,repo):
-        if repo != "ADDICTO": #todo: for testing BCIO, MF and MFOEM only remove this
-            # print("repo is: ", repo)
-            # Keep track of when you parsed this release
-            self.graphs[repo] = networkx.MultiDiGraph()
-            self.releasedates[repo] = date.today()
-            #print("Release date ",self.releasedates[repo])
-            # Get the ontology from the repository
-            #todo: get ontofilename, repositories and repo_detail from BSSOFoundry
-            # ontofilename = app.config['RELEASE_FILES'][repo]
-            repositories = source_repositories
-            # repositories = app.config['REPOSITORIES']
-            repo_detail = repositories[repo]
-            location = repo_detail
+        # if repo != "ADDICTO": #todo: for testing BCIO, MF and MFOEM only remove this
+        # print("repo is: ", repo)
+        # Keep track of when you parsed this release
+        self.graphs[repo] = networkx.MultiDiGraph()
+        self.releasedates[repo] = date.today()
+        #print("Release date ",self.releasedates[repo])
+        # Get the ontology from the repository
+        #todo: get ontofilename, repositories and repo_detail from BSSOFoundry
+        # ontofilename = app.config['RELEASE_FILES'][repo]
+        repositories = source_repositories
+        # repositories = app.config['REPOSITORIES']
+        repo_detail = repositories[repo]
+        location = repo_detail
 
-            print("got location", location)
-            # location = f"https://raw.githubusercontent.com/{repo_detail}/master/{ontofilename}"
-            # print("Fetching release file from", location)
-            data = self.resolve(location) #.read()
-            print("got data", data)
-            data = urlopen(location).read()  # .read for bytes - needed? 
-            ontofile = data.decode('utf-8')
+        print("got location", location)
+        # location = f"https://raw.githubusercontent.com/{repo_detail}/master/{ontofilename}"
+        # print("Fetching release file from", location)
+        data = self.resolve(location) #.read()
+        print("got data", data)
+        data = urlopen(location).read()  # .read for bytes - needed? 
+        ontofile = data.decode('utf-8')
 
-            # Parse it
-            if ontofile:
-                self.releases[repo] = pyhornedowl.open_ontology(ontofile) #todo: panic error here..
-                prefixes = app.config['PREFIXES']
-                for prefix in prefixes:
-                    self.releases[repo].add_prefix_mapping(prefix[0],prefix[1])
-                for classIri in self.releases[repo].get_classes():
-                    classId = self.releases[repo].get_id_for_iri(classIri)
-                    if classId:
-                        classId = classId.replace(":","_")
-                        # is it already in the graph?
-                        if classId not in self.graphs[repo].nodes:
-                            label = self.releases[repo].get_annotation(classIri, app.config['RDFSLABEL'])
-                            if label:
-                                self.label_to_id[label.strip()] = classId
-                                # print(classId)
-                                self.graphs[repo].add_node(classId,
-                                                        label=label.strip().replace(" ", "\n"),
-                                                    **OntologyDataStore.node_props)
-                            else:
-                                print("Could not determine label for IRI",classIri)
-                    else:
-                        print("Could not determine ID for IRI",classIri)
-                for classIri in self.releases[repo].get_classes():
-                    classId = self.releases[repo].get_id_for_iri(classIri)
-                    if classId:
-                        parents = self.releases[repo].get_superclasses(classIri)
-                        for p in parents:
-                            plabel = self.releases[repo].get_annotation(p, app.config['RDFSLABEL'])
-                            if plabel and plabel.strip() in self.label_to_id:
-                                self.graphs[repo].add_edge(self.label_to_id[plabel.strip()],
-                                                        classId.replace(":", "_"), dir="back")
-                        axioms = self.releases[repo].get_axioms_for_iri(classIri) # other relationships
-                        for a in axioms:
-                            # Example: ['SubClassOf', 'http://purl.obolibrary.org/obo/CHEBI_27732', ['ObjectSomeValuesFrom', 'http://purl.obolibrary.org/obo/RO_0000087', 'http://purl.obolibrary.org/obo/CHEBI_60809']]
-                            if len(a) == 3 and a[0]=='SubClassOf' \
-                                and isinstance(a[2], list) and len(a[2])==3 \
-                                and a[2][0]=='ObjectSomeValuesFrom':
-                                relIri = a[2][1]
-                                targetIri = a[2][2]
-                                rel_name = self.releases[repo].get_annotation(relIri, app.config['RDFSLABEL'])
-                                targetLabel = self.releases[repo].get_annotation(targetIri, app.config['RDFSLABEL'])
-                                if targetLabel and targetLabel.strip() in self.label_to_id:
-                                    if rel_name in OntologyDataStore.rel_cols:
-                                        rcolour = OntologyDataStore.rel_cols[rel_name]
-                                    else:
-                                        rcolour = "orange"
-                                    self.graphs[repo].add_edge(classId.replace(":", "_"),
-                                                            self.label_to_id[targetLabel.strip()],
-                                                            color=rcolour,
-                                                            label=rel_name)
+        # Parse it
+        if ontofile:
+            self.releases[repo] = pyhornedowl.open_ontology(ontofile) #todo: panic error here..
+            prefixes = app.config['PREFIXES']
+            for prefix in prefixes:
+                self.releases[repo].add_prefix_mapping(prefix[0],prefix[1])
+            for classIri in self.releases[repo].get_classes():
+                classId = self.releases[repo].get_id_for_iri(classIri)
+                if classId:
+                    classId = classId.replace(":","_")
+                    # is it already in the graph?
+                    if classId not in self.graphs[repo].nodes:
+                        label = self.releases[repo].get_annotation(classIri, app.config['RDFSLABEL'])
+                        if label:
+                            self.label_to_id[label.strip()] = classId
+                            # print(classId)
+                            self.graphs[repo].add_node(classId,
+                                                    label=label.strip().replace(" ", "\n"),
+                                                **OntologyDataStore.node_props)
+                        else:
+                            print("Could not determine label for IRI",classIri)
+                else:
+                    print("Could not determine ID for IRI",classIri)
+            for classIri in self.releases[repo].get_classes():
+                classId = self.releases[repo].get_id_for_iri(classIri)
+                if classId:
+                    parents = self.releases[repo].get_superclasses(classIri)
+                    for p in parents:
+                        plabel = self.releases[repo].get_annotation(p, app.config['RDFSLABEL'])
+                        if plabel and plabel.strip() in self.label_to_id:
+                            self.graphs[repo].add_edge(self.label_to_id[plabel.strip()],
+                                                    classId.replace(":", "_"), dir="back")
+                    axioms = self.releases[repo].get_axioms_for_iri(classIri) # other relationships
+                    for a in axioms:
+                        # Example: ['SubClassOf', 'http://purl.obolibrary.org/obo/CHEBI_27732', ['ObjectSomeValuesFrom', 'http://purl.obolibrary.org/obo/RO_0000087', 'http://purl.obolibrary.org/obo/CHEBI_60809']]
+                        if len(a) == 3 and a[0]=='SubClassOf' \
+                            and isinstance(a[2], list) and len(a[2])==3 \
+                            and a[2][0]=='ObjectSomeValuesFrom':
+                            relIri = a[2][1]
+                            targetIri = a[2][2]
+                            rel_name = self.releases[repo].get_annotation(relIri, app.config['RDFSLABEL'])
+                            targetLabel = self.releases[repo].get_annotation(targetIri, app.config['RDFSLABEL'])
+                            if targetLabel and targetLabel.strip() in self.label_to_id:
+                                if rel_name in OntologyDataStore.rel_cols:
+                                    rcolour = OntologyDataStore.rel_cols[rel_name]
+                                else:
+                                    rcolour = "orange"
+                                self.graphs[repo].add_edge(classId.replace(":", "_"),
+                                                        self.label_to_id[targetLabel.strip()],
+                                                        color=rcolour,
+                                                        label=rel_name)
 
     def getReleaseLabels(self, repo):
         all_labels = set()
