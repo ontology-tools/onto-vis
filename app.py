@@ -142,7 +142,7 @@ class OntologyDataStore:
         # Parse it
         if ontofile:
             self.releases[repo] = pyhornedowl.open_ontology(ontofile) #todo: panic error here..
-            prefixes = app.config['PREFIXES']
+            prefixes = app.config['PREFIXES'] #todo: get these from BSSOFoundry instead of config? 
             for prefix in prefixes:
                 self.releases[repo].add_prefix_mapping(prefix[0],prefix[1])
             for classIri in self.releases[repo].get_classes():
@@ -370,8 +370,9 @@ def get_ids_for_one(current_ontol):
 @app.route('/')
 @app.route('/home')
 def home():
-    ontologies_for_list = app.config["RELEASE_FILES"].keys() #todo: get these from BSSOFoundry
-    # print("ontologies_for_list: ", ontologies_for_list)
+    # ontologies_for_list = app.config["RELEASE_FILES"].keys() #todo: get these from BSSOFoundry
+    ontologies_for_list = repo_names
+    print("ontologies_for_list: ", ontologies_for_list)
     labels = get_ids(ontologies_for_list) #todo: this into [][] 
     label_list = labels
     # ontologies = ["BCIO", "AddictO"] #todo: get these from BSSOFoundry
