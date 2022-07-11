@@ -60,7 +60,7 @@ for result in linksData:
                 repo_name = line.replace("id: ", "").strip().upper() #todo: not .upper!       
                 repo_names.append(repo_name)
         # testing without non-upper AddictO or incorrect BCIO: todo: fix this!
-        if repo_name != "ADDICTO" and repo_name != "BCIO":
+        if repo_name != "ADDICTO":
             source_repositories[repo_name] = source_url
 
 print("source_repositories: ", source_repositories)
@@ -111,7 +111,7 @@ class OntologyDataStore:
         #     self.parseRelease(repo)
 
     def parseRelease(self,repo):
-        if repo != "ADDICTO" and repo != "BCIO": #todo: for testing MF and MFOEM only remove this
+        if repo != "ADDICTO": #todo: for testing MF and MFOEM only remove this
             # print("repo is: ", repo)
             # Keep track of when you parsed this release
             self.graphs[repo] = networkx.MultiDiGraph()
@@ -365,7 +365,7 @@ def home():
     labels = get_ids(ontologies_for_list) #todo: this into [][] 
     label_list = labels
     # ontologies = ["BCIO", "AddictO"] #todo: get these from BSSOFoundry
-    ontologies = ["MF", "MFOEM"] #todo: get these from BSSOFoundry
+    ontologies = ["BCIO", "MF", "MFOEM"] #todo: get these from BSSOFoundry
     #label_list_two test: 
     
     label_list_two = [["a", "b", "c"], ["d", "e", "f"]] #this is fine..
