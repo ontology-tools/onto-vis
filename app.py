@@ -57,11 +57,17 @@ for result in linksData:
                 # source_urls.append(source_url)
         for line in md_html.split('\n'):
             if "id: " in line and "- id: " not in line and "orcid" not in line:
-                repo_name = line.replace("id: ", "").strip().upper() #todo: not .upper!       
-                repo_names.append(repo_name)
-        # testing without non-upper AddictO: todo: fix this!
+                repo_name = line.replace("id: ", "").strip().upper() #todo: not .upper?? 
+                if repo_name != "ADDICTO":      
+                    repo_names.append(repo_name)
+                else: 
+                    repo_names.append("AddictO") # work-around for non-upper AddictO: todo: fix this!
+        # work-around for non-upper AddictO: todo: fix this!
         if repo_name != "ADDICTO":
             source_repositories[repo_name] = source_url
+        else: 
+            #todo: url for AddictO not resolving - 
+            source_repositories['AddictO'] = "https://raw.githubusercontent.com/addiction-ssa/addiction-ontology/master/addicto.owl" # source_url # todo: make this kluge exception for AddictO go away
 
 print("source_repositories: ", source_repositories)
 
@@ -308,7 +314,11 @@ class OntologyDataStore:
         return (entries)
         
     def resolve(self, url):
-        return urlopen(url).geturl()
+        try:
+            return urlopen(url).geturl()
+        except: 
+            print("error resolving url: ", url)
+            pass
 
 ontodb = OntologyDataStore()
 
@@ -367,7 +377,7 @@ def home():
     # ontologies = ["BCIO", "AddictO"] #todo: get these from BSSOFoundry
     # ontologies = ["BCIO", "MF", "MFOEM"] #todo: get these from BSSOFoundry
     ontologies = repo_names # now from BSSOFoundry 
-    ontologies.pop(0) #todo: ADDICTO still not working, fix! This line removes it for testing
+    # ontologies.pop(0) #todo: ADDICTO still not working, fix! This line removes it for testing
     print("ontologies are: ", ontologies)
     #label_list_two test: 
     
