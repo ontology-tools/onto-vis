@@ -14,8 +14,11 @@ CACHE_DEFAULT_TIMEOUT = 172800 # 2 days
 
 DATABASE_URI = 'sqlite:////tmp/github-flask-ontospreaded.db'
 
+#todo: get RELEASE_FILES from BSSOFoundry?
 RELEASE_FILES = {"AddictO": "addicto-merged.owx",
-                 "BCIO": "Upper%20Level%20BCIO/bcio-merged.owx"}
+                 "BCIO": "Upper%20Level%20BCIO/bcio-merged.owx", 
+                 "MF": "asdfaf", 
+                 "MFOEM": "asdfasdf"}
 
 OWL_LOCATIONS = {"AddictO": "http://purl.obolibrary.org/obo/addicto.owl",
                  "BCIO": "http://purl.obolibrary.org/obo/bcio.owl",
