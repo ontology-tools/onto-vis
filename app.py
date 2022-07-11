@@ -44,6 +44,10 @@ repo_names = []
 # repositories = []
 source_repositories = {}
 
+# todo: source_repositories only updated on restart? 
+
+# get the .owl url and name information from BSSOFoundry github:
+
 for result in linksData:
     download_url = result['download_url']
     if "_outline" in download_url:
@@ -313,6 +317,8 @@ class OntologyDataStore:
             pass
         return (entries)
         
+    # resolve redirecting urls: 
+    
     def resolve(self, url):
         try:
             return urlopen(url).geturl()
@@ -371,7 +377,7 @@ def get_ids_for_one(current_ontol):
 @app.route('/home')
 def home():
     # ontologies_for_list = app.config["RELEASE_FILES"].keys() #todo: get these from BSSOFoundry
-    ontologies_for_list = repo_names
+    ontologies_for_list = repo_names #todo: this is the same as ontologies, refactor? 
     print("ontologies_for_list: ", ontologies_for_list)
     labels = get_ids(ontologies_for_list) #todo: this into [][] 
     label_list = labels
