@@ -61,11 +61,8 @@ for result in linksData:
                 # source_urls.append(source_url)
         for line in md_html.split('\n'):
             if "id: " in line and "- id: " not in line and "orcid" not in line:
-                repo_name = line.replace("id: ", "").strip().upper() #todo: not .upper?? 
-                # if repo_name != "ADDICTO":      
+                repo_name = line.replace("id: ", "").strip().upper()                      
                 repo_names.append(repo_name)
-                # else: 
-                #     repo_names.append("AddictO") # work-around for non-upper AddictO: todo: fix this!
         # work-around for non-upper AddictO: todo: fix this!
         if repo_name != "ADDICTO":
             source_repositories[repo_name] = source_url
@@ -74,35 +71,6 @@ for result in linksData:
             source_repositories['ADDICTO'] = "https://raw.githubusercontent.com/addiction-ssa/addiction-ontology/master/addicto.owl" # source_url # todo: make this kluge exception for AddictO go away
 
 print("source_repositories: ", source_repositories)
-
-
-
-#location = f"https://raw.githubusercontent.com/addicto-org/addiction-ontology/master/addicto-merged.owx"
-#location2 = f"https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio-merged.owx"
-
-#print("Fetching release file from", location)
-#ontol1 = pyhornedowl.open_ontology(urlopen(location).read().decode('utf-8'))
-#print("Fetching release file from", location2)
-#ontol2 = pyhornedowl.open_ontology(urlopen(location2).read().decode('utf-8'))
-
-#ontoDict = {
-#    "ontologies": [
-#        {
-#            "label": "BCIO",
-#            "name": "BCIO",
-#            "ontology": ontol2
-#        },
-#
-#        {
-#            "label": "AddictO",
-#             "name": "AddictO",
-#            "ontology": ontol1
-#        },
-#    ]
-#}
-
-#github = GitHub(app)
-
 
 class OntologyDataStore:
     node_props = {"shape":"box","style":"rounded", "font": "helvetica"}
@@ -117,35 +85,24 @@ class OntologyDataStore:
         self.graphs = {}
         for repo in source_repositories:
             self.parseRelease(repo)
-        # for repo in app.config["REPOSITORIES"]: # now getting these from BSSOFOUNDRY instead of app.config
-        #     self.parseRelease(repo)
 
     def parseRelease(self,repo):
-        # if repo != "ADDICTO": #todo: for testing BCIO, MF and MFOEM only remove this
-        # print("repo is: ", repo)
-        # Keep track of when you parsed this release
         self.graphs[repo] = networkx.MultiDiGraph()
         self.releasedates[repo] = date.today()
         #print("Release date ",self.releasedates[repo])
         # Get the ontology from the repository
-        #todo: get ontofilename, repositories and repo_detail from BSSOFoundry
-        # ontofilename = app.config['RELEASE_FILES'][repo]
         repositories = source_repositories
-        # repositories = app.config['REPOSITORIES']
         repo_detail = repositories[repo]
         location = repo_detail
-
         print("got location", location)
-        # location = f"https://raw.githubusercontent.com/{repo_detail}/master/{ontofilename}"
-        # print("Fetching release file from", location)
-        data = self.resolve(location) #.read()
+        data = self.resolve(location) # resolves redirects
         print("got data", data)
         data = urlopen(location).read()  # .read for bytes - needed? 
         ontofile = data.decode('utf-8')
 
         # Parse it
         if ontofile:
-            self.releases[repo] = pyhornedowl.open_ontology(ontofile) #todo: panic error here..
+            self.releases[repo] = pyhornedowl.open_ontology(ontofile) 
             prefixes = app.config['PREFIXES'] #todo: get these from BSSOFoundry instead of config? 
             for prefix in prefixes:
                 self.releases[repo].add_prefix_mapping(prefix[0],prefix[1])
@@ -218,7 +175,7 @@ class OntologyDataStore:
         ids = []
         for id in selectedIds:
             try: 
-                # print("got one", id)
+                # print("got id: ", id)
                 ids.append(id.replace(":","_"))
                 if ":" in id or "_" in id: 
                     entryIri = self.releases[repo].get_iri_for_id(id.replace("_", ":"))
@@ -260,9 +217,8 @@ class OntologyDataStore:
                 # print("Should exclude: ", excludes)
                 # print("ids after exclude: ", ids)
                 subgraphs.append(self.graphs[repo].subgraph(ids))
-            #test combine two graphs:
+            # combine two graphs:
             F = networkx.compose_all(subgraphs)
-            # F = networkx.compose(subgraphs[0], subgraphs[1])
             P = networkx.nx_pydot.to_pydot(F)
             return (P)   
         else:              
@@ -324,7 +280,7 @@ class OntologyDataStore:
             return urlopen(url).geturl()
         except: 
             print("error resolving url: ", url)
-            pass
+            pass # todo: return something rather? 
 
 ontodb = OntologyDataStore()
 
@@ -340,7 +296,6 @@ def get_ids(ontol_list):
             # print("for classIri running")        
             label = ontol.get_annotation(classIri, RDFSLABEL)
             # print("label: ", label) 
-            # label = ontol.get_annotation(classId, RDFSLABEL)
             if classIri:                
                 classId = str(classIri).rsplit('/', 1)[1].replace('_', ':').strip()
                 # print(classId)
@@ -362,7 +317,6 @@ def get_ids_for_one(current_ontol):
         # print("for classIri running")        
         label = ontol.get_annotation(classIri, RDFSLABEL)
         # print("label: ", label) 
-        # label = ontol.get_annotation(classId, RDFSLABEL)
         if classIri:                
             classId = str(classIri).rsplit('/', 1)[1].replace('_', ':').strip()
             # print(classId)
@@ -376,17 +330,14 @@ def get_ids_for_one(current_ontol):
 @app.route('/')
 @app.route('/home')
 def home():
-    # ontologies_for_list = app.config["RELEASE_FILES"].keys() #todo: get these from BSSOFoundry
     ontologies_for_list = repo_names #todo: this is the same as ontologies, refactor? 
     print("ontologies_for_list: ", ontologies_for_list)
-    labels = get_ids(ontologies_for_list) #todo: this into [][] 
+    labels = get_ids(ontologies_for_list) 
     label_list = labels
-    # ontologies = ["BCIO", "AddictO"] #todo: get these from BSSOFoundry
-    # ontologies = ["BCIO", "MF", "MFOEM"] #todo: get these from BSSOFoundry
     ontologies = repo_names # now from BSSOFoundry 
-    # ontologies.pop(0) #todo: ADDICTO still not working, fix! This line removes it for testing
     print("ontologies are: ", ontologies)
-    #label_list_two test: 
+
+    #label_list_two: 
     
     label_list_two = [["a", "b", "c"], ["d", "e", "f"]] #this is fine..
 
@@ -397,20 +348,15 @@ def get_values():
     current_ontology=request.form.get("ontology") 
     # print("got request for current_ontology: ", current_ontology)
 
-    # ontologies_for_list = app.config["RELEASE_FILES"].keys() #todo: get these from BSSOFoundry
-    # print("ontologies_for_list: ", ontologies_for_list)
-
     labels = get_ids_for_one(current_ontology)
     # print("got labels in /get_values: ", labels)
     # print("size of labels: ", len(labels))
     label_list = labels
-    # label_list = ["a", "b", "c"] #test values
     return jsonify(label_list)
 
 @app.route('/visualise', methods=['POST'])
 def visualise():
-    # print("open called")
-    #build data we need for dotStr query (new one!)
+    # build data we need for dotStr query:
     if request.method == "POST":
         idString = request.form.get("idList")
         excludeIDString = request.form.get("excludeIDList")
