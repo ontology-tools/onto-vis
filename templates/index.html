@@ -69,13 +69,13 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="alertBoxLabel">No Ontology chosen</h5>
+        <h5 class="modal-title" id="alertBoxLabel">No ontology chosen</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        Please select one or more of the checkboxes
+        Please select one or more ontology
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -83,30 +83,33 @@
     </div>
   </div>
 </div>
-<h2 style="text-align: center;">
-    Input a list of ID's below, choose your Ontology, then press "Submit":
-</h2>
+<h4 style="text-align: center;">
+    Choose your Ontology, input a list of IDs below, then press "Submit". 
+</h4>
+<h4 style="text-align: center;">
+    To visualise the full ontology, leave the list of IDs empty.
+</h4>
 
 <div id="form_div" style="text-align: center;">    
     <form  target=”_blank” id="submitText" name="form" method="POST" style="text-align: center;"
     action="/visualise" onsubmit="return required()">
     
     <h4>
-      <span class="badge badge-secondary" placeholder="EG: AddictO BCIO">
+      <span class="badge badge-secondary" placeholder="EG: AddictO BCIO" style = "margin-top: 20px;">
           Choice of Ontologies
       </span>
   </h4>
-  
+  <div id="ont_div" style=" border-radius: 3px;  padding: 6px 11px; font-size: 24px; text-align: center;">  
   {% for ont in ontologies %}
-  <input id="{{ont}}" type="checkbox" name="{{ont}}" value="{{ont}}">{{ont}}
+  <input id="{{ont}}" type="checkbox" name="{{ont}}" value="{{ont}}" style = "margin: 0px 10px; position: relative; bottom: 3px;" >{{ont}}
   {% endfor %}
   <input id="repo-text-box" name="repo" value="" hidden="true">
-
+  </div>
     <div class="container">
       <div class="row">
 
         <div class="col">
-          <label for="search-replace" class="control-label">Look up ID's here:</label>
+          <label for="search-replace" class="control-label">Look up IDs here:</label>
           <input class="form-control bs-autocomplete" id="search-replace" value="" placeholder="ID or Label..." type="text"
             data-source="demo_source.php" data-hidden_field_id="id-or-label" data-item_id="id" data-item_label="name"
             autocomplete="off">
@@ -116,7 +119,7 @@
           </div>
           <h4>
             <span class="badge badge-secondary">
-                List of ID's (separated by commas)
+                List of IDs (separated by commas)
             </span>
           </h4>
           <textarea id="idList" form="submitText" class="form-control" placeholder="" name="idList"rows="10"></textarea>
@@ -124,7 +127,7 @@
 
 
         <div class="col">
-          <label for="search-replace2" class="control-label">Look up ID's to exclude here:</label>
+          <label for="search-replace2" class="control-label">Look up IDs to exclude here:</label>
           <input class="form-control bs-autocomplete2" id="search-replace2" value="" placeholder="ID or Label..." type="text"
             data-source="demo_source.php" data-hidden_field_id="id-or-label2" data-item_id="id" data-item_label="name"
             autocomplete="off">
@@ -134,16 +137,18 @@
           </div>
             <h4>
               <span class="badge badge-secondary">
-                  ID's to exclude (separated by commas)
+                  IDs to exclude (separated by commas)
               </span>
             </h4>
-            <textarea id="excludeIDList" form="submitText" class="form-control" name="excludeIDList"rows="3"></textarea>
+            <textarea id="excludeIDList" form="submitText" class="form-control" name="excludeIDList"rows="10"></textarea>
               <br>
           
-          <input class="btn btn-outline-primary" type="submit" value="Submit">
+          
         </div> 
+        
 
      </div>
+     <input class="btn btn-outline-primary" type="submit" value="Submit" style="margin-top: 20px;">
     </div> 
     </form>
 </div>
