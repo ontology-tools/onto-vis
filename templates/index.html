@@ -56,6 +56,14 @@
       margin-top: .5em;
       margin-right: .5em;
     }
+
+    .background-pale-green{
+      background-color: rgba(115, 255, 0, 0.411);
+    }
+
+    .background-pale-red{
+      background-color: rgba(255, 0, 0, 0.411);
+    }
   
    
   </style>
@@ -115,7 +123,7 @@
       <div class="row">
 
         <div class="col">
-          <div class="card border-info mb-3">
+          <div class="card background-pale-green border-info mb-3">
             <div class="card-body">
               <label for="search-replace" class="control-label">Look up IDs here:</label>
               <input class="form-control bs-autocomplete" id="search-replace" value="" placeholder="ID or Label..." type="text"
@@ -138,7 +146,7 @@
 
 
         <div class="col">
-          <div class="card border-danger mb-3">
+          <div class="card background-pale-red border-danger mb-3">
             <div class="card-body">
               <label for="search-replace2" class="control-label">Look up IDs to exclude here:</label>
               <input class="form-control bs-autocomplete2" id="search-replace2" value="" placeholder="ID or Label..." type="text"
