@@ -1,5 +1,5 @@
 Flask==1.0.2
-py-horned-owl==0.1.4
+py-horned-owl==0.2.0
 uwsgi
 itsdangerous==2.0.1
 flask_cors
