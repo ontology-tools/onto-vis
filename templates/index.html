@@ -326,41 +326,22 @@ $('input[type="checkbox"]').click(function() {
         autoFocus: false,
 
         source: function (request, response) {
-          // console.log("request.term: " + request.term);
-          original_term = request.term;
+          original_term = request.term; //search term typed by user
           var _regexp = new RegExp(request.term, 'i');
-          // var a = levDist("hello", "hi");
-          // console.log(a);
-          // var labelArrayMod = labelArray.sort(function(a, b){
-          //   // console.log(a);
-          //   // console.log(b);
-          //   levDist(a.name, original_term);
-          //   levDist(b.name, original_term);
-          // });
           var dataUnsorted = labelArray.filter(function (item) {
             // console.log(item.name);            
             return item.name.match(_regexp);
           });
-          var data = dataUnsorted.sort(function(a, b){
-            // console.log(a.name);
-            // console.log(b.name);
-            //todo: strip a.name and b.name of ID:
+          var data = dataUnsorted.sort(function(a, b){            
+            //strip a.name and b.name of ID for comparison:
             var a_term = a.name.substring(a.name.indexOf("|") + 1);
             var b_term = b.name.substring(b.name.indexOf("|") + 1);
+            //get levenshtein distance from search term and compare:
             var dista = levDist(a_term, original_term);
             var distb = levDist(b_term, original_term);
             return dista - distb;
-            
-            // console.log(levDist(a.name, original_term));
-            // console.log(levDist(a.name, original_term));
           });
-          console.log("got data");
-          console.log(data[0]);
-          // console.log(typeof(data));
-          // for(key in data){
-          //   console.log(data[key]);
-          // }
-          
+
           response(data);
         },
 
@@ -370,11 +351,6 @@ $('input[type="checkbox"]').click(function() {
         },
 
         response: function (event, ui) {
-          //todo: manipulate data here
-          // console.log("looking for " + original_term); //works
-          // console.log("got: ");
-          // console.log(ui.content[0].name); //one value - works
-
           feedback_icon.hide();
         },
 
@@ -428,11 +404,22 @@ $('input[type="checkbox"]').click(function() {
         autoFocus: false,
 
         source: function (request, response) {
+          original_term = request.term; //search term typed by user
           var _regexp = new RegExp(request.term, 'i');
-          var data = labelArray.filter(function (item) {
-            // console.log("item is: ", item);
+          var dataUnsorted = labelArray.filter(function (item) {
+            // console.log(item.name);            
             return item.name.match(_regexp);
           });
+          var data = dataUnsorted.sort(function(a, b){            
+            //strip a.name and b.name of ID for comparison:
+            var a_term = a.name.substring(a.name.indexOf("|") + 1);
+            var b_term = b.name.substring(b.name.indexOf("|") + 1);
+            //get levenshtein distance from search term and compare:
+            var dista = levDist(a_term, original_term);
+            var distb = levDist(b_term, original_term);
+            return dista - distb;
+          });
+
           response(data);
         },
 

@@ -232,7 +232,7 @@ class OntologyDataStore:
             else:
                 ids = list(set(ids) - set(excludes)) # exclude some ID's 
             # print("Should exclude: ", excludes)
-            print("ids after exclude: ", ids)
+            # print("ids after exclude: ", ids)
             subgraph = self.graphs[repos[0]].subgraph(ids)            
             P = networkx.nx_pydot.to_pydot(subgraph)
             return (P)   
@@ -338,11 +338,11 @@ def get_ids_for_one(current_ontol):
 @app.route('/home')
 def home():
     ontologies_for_list = repo_names #todo: this is the same as ontologies, refactor? 
-    print("ontologies_for_list: ", ontologies_for_list)
+    # print("ontologies_for_list: ", ontologies_for_list)
     labels = get_ids(ontologies_for_list) 
     label_list = labels
     ontologies = repo_names # now from BSSOFoundry 
-    print("ontologies are: ", ontologies)
+    # print("ontologies are: ", ontologies)
 
     #label_list_two: 
     
@@ -356,7 +356,7 @@ def get_values():
     # print("got request for current_ontology: ", current_ontology)
 
     labels = get_ids_for_one(current_ontology)
-    print("got labels in /get_values: ", labels)
+    # print("got labels in /get_values: ", labels)
     # print("size of labels: ", len(labels))
     label_list = labels
     return jsonify(label_list)
