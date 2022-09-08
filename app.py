@@ -356,7 +356,7 @@ def get_values():
     # print("got request for current_ontology: ", current_ontology)
 
     labels = get_ids_for_one(current_ontology)
-    # print("got labels in /get_values: ", labels)
+    print("got labels in /get_values: ", labels)
     # print("size of labels: ", len(labels))
     label_list = labels
     return jsonify(label_list)
