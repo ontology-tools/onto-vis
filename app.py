@@ -394,7 +394,7 @@ def visualise():
                 for ID in allIds: 
                     if ID is not None and ID != "":
                         idList.append(ID.strip())
-        print("idList is: ", idList)
+        # print("idList is: ", idList)
         excludeIDListUnderscore = [s.replace(":", "_") for s in excludeIDList]
         dotStr = ontodb.getDotForMultipleIDs(repos, idList, excludeIDListUnderscore).to_string()
 
