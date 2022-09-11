@@ -43,10 +43,8 @@
   
     ul.bs-autocomplete-menu li {
       text-align: left;
-      border-radius: 50%;
-      border: .25em solid #ccc;
-  
-      
+      border-radius: 8px;
+      border: .16em solid #ccc;      
     }
   
     .bs-autocomplete-feedback {
@@ -176,6 +174,58 @@
 
 
 <script>
+
+//Levenshtein distance algorithm from here: https://stackoverflow.com/questions/11919065/sort-an-array-by-the-levenshtein-distance-with-best-performance-in-javascript
+var levDist = function(s, t) {
+    var d = []; //2d matrix
+
+    // Step 1
+    var n = s.length;
+    var m = t.length;
+
+    if (n == 0) return m;
+    if (m == 0) return n;
+
+    //Create an array of arrays in javascript (a descending loop is quicker)
+    for (var i = n; i >= 0; i--) d[i] = [];
+
+    // Step 2
+    for (var i = n; i >= 0; i--) d[i][0] = i;
+    for (var j = m; j >= 0; j--) d[0][j] = j;
+
+    // Step 3
+    for (var i = 1; i <= n; i++) {
+        var s_i = s.charAt(i - 1);
+
+        // Step 4
+        for (var j = 1; j <= m; j++) {
+
+            //Check the jagged ld total so far
+            if (i == j && d[i][j] > 4) return n;
+
+            var t_j = t.charAt(j - 1);
+            var cost = (s_i == t_j) ? 0 : 1; // Step 5
+
+            //Calculate the minimum
+            var mi = d[i - 1][j] + 1;
+            var b = d[i][j - 1] + 1;
+            var c = d[i - 1][j - 1] + cost;
+
+            if (b < mi) mi = b;
+            if (c < mi) mi = c;
+
+            d[i][j] = mi; // Step 6
+
+            //Damerau transposition
+            if (i > 1 && j > 1 && s_i == t.charAt(j - 2) && s.charAt(i - 2) == t_j) {
+                d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + cost);
+            }
+        }
+    }
+
+    // Step 7
+    return d[n][m];
+}
     //ID complete functions from onto-text-tag
      $(function () {
       $('[data-toggle="popover"]').popover({ html: true });
@@ -257,10 +307,11 @@ $('input[type="checkbox"]').click(function() {
 
   (function () {
 
-
-    "use strict";
+  let original_term;
+    // "use strict";
     $('.bs-autocomplete').each(function () {
       var _this = $(this),
+      // _original_request = "";
         _data = _this.data(),
         _hidden_field = $('#' + _data.hidden_field_id);
       _hidden_field.hide();
@@ -276,11 +327,22 @@ $('input[type="checkbox"]').click(function() {
         autoFocus: false,
 
         source: function (request, response) {
+          original_term = request.term; //search term typed by user
           var _regexp = new RegExp(request.term, 'i');
-          var data = labelArray.filter(function (item) {
-            // console.log("item is: ", item);
+          var dataUnsorted = labelArray.filter(function (item) {
+            // console.log(item.name);            
             return item.name.match(_regexp);
           });
+          var data = dataUnsorted.sort(function(a, b){            
+            //strip a.name and b.name of ID for comparison:
+            var a_term = a.name.substring(a.name.indexOf("|") + 1);
+            var b_term = b.name.substring(b.name.indexOf("|") + 1);
+            //get levenshtein distance from search term and compare:
+            var dista = levDist(a_term, original_term);
+            var distb = levDist(b_term, original_term);
+            return dista - distb;
+          });
+
           response(data);
         },
 
@@ -289,7 +351,7 @@ $('input[type="checkbox"]').click(function() {
           _hidden_field.val('');
         },
 
-        response: function () {
+        response: function (event, ui) {
           feedback_icon.hide();
         },
 
@@ -305,7 +367,7 @@ $('input[type="checkbox"]').click(function() {
           idResultList.push(ui.item[_data.item_label]);
           
           //append to text box: 
-          var elem = document.getElementById('idList'); //todo: use text box below instead?
+          var elem = document.getElementById('idList'); 
           if(elem.value.trim() == "" || elem.value == null){
             elem.value += ui.item[_data.item_label];
           } else{
@@ -343,11 +405,22 @@ $('input[type="checkbox"]').click(function() {
         autoFocus: false,
 
         source: function (request, response) {
+          original_term = request.term; //search term typed by user
           var _regexp = new RegExp(request.term, 'i');
-          var data = labelArray.filter(function (item) {
-            // console.log("item is: ", item);
+          var dataUnsorted = labelArray.filter(function (item) {
+            // console.log(item.name);            
             return item.name.match(_regexp);
           });
+          var data = dataUnsorted.sort(function(a, b){            
+            //strip a.name and b.name of ID for comparison:
+            var a_term = a.name.substring(a.name.indexOf("|") + 1);
+            var b_term = b.name.substring(b.name.indexOf("|") + 1);
+            //get levenshtein distance from search term and compare:
+            var dista = levDist(a_term, original_term);
+            var distb = levDist(b_term, original_term);
+            return dista - distb;
+          });
+
           response(data);
         },
 
@@ -372,7 +445,7 @@ $('input[type="checkbox"]').click(function() {
           idResultList.push(ui.item[_data.item_label]);
           
           //append to text box: 
-          var elem = document.getElementById('excludeIDList'); //todo: use text box below instead?
+          var elem = document.getElementById('excludeIDList'); 
           if(elem.value.trim() == "" || elem.value == null){
             elem.value += ui.item[_data.item_label];
           } else{

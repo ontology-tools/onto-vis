@@ -36,8 +36,6 @@ app.config.from_object('config')
 #get source repositories: 
 query_url = f"https://api.github.com/repos/bssofoundry/bssofoundry.github.io/contents/ontology?ref=main"
 
-query_url = f"https://api.github.com/repos/bssofoundry/bssofoundry.github.io/contents/ontology?ref=main"
-
 headers = {'Accept': f'application/vnd.github.v3+json'}
 r = requests.get(query_url, headers=headers)
 linksData = r.json()
@@ -122,6 +120,9 @@ class OntologyDataStore:
                                                 **OntologyDataStore.node_props)
                         else:
                             print("Could not determine label for IRI",classIri)
+                            self.graphs[repo].add_node(classId, #test add ID without label todo: is this necessary? Doesn't seem to hurt?
+                                                    label=" \n",
+                                                **OntologyDataStore.node_props)
                 else:
                     print("Could not determine ID for IRI",classIri)
             for classIri in self.releases[repo].get_classes():
@@ -213,6 +214,7 @@ class OntologyDataStore:
                 if len(excludes) < 1 or (len(excludes) == 1 and excludes[0] == ""): 
                     ids = ids
                     # print("not excluding anything")
+                    # print("adding ids: ", ids)
                 else:
                     ids = list(set(ids) - set(excludes)) # exclude some ID's 
                 # print("Should exclude: ", excludes)
@@ -304,6 +306,8 @@ def get_ids(ontol_list):
                     # print("got classId and labels") 
                     checklist.append(classId + "|"+ label)                   
                     # print(classId, ": ", label)
+                elif classId:
+                    checklist.append(classId)
                     
     return checklist
 
@@ -325,6 +329,8 @@ def get_ids_for_one(current_ontol):
                 # print("got classId and labels") 
                 checklist.append(classId + "|"+ label)                   
                 # print(classId, ": ", label)
+            elif classId:
+                checklist.append(classId) 
                     
     return checklist
 
@@ -332,11 +338,11 @@ def get_ids_for_one(current_ontol):
 @app.route('/home')
 def home():
     ontologies_for_list = repo_names #todo: this is the same as ontologies, refactor? 
-    print("ontologies_for_list: ", ontologies_for_list)
+    # print("ontologies_for_list: ", ontologies_for_list)
     labels = get_ids(ontologies_for_list) 
     label_list = labels
     ontologies = repo_names # now from BSSOFoundry 
-    print("ontologies are: ", ontologies)
+    # print("ontologies are: ", ontologies)
 
     #label_list_two: 
     
@@ -388,7 +394,7 @@ def visualise():
                 for ID in allIds: 
                     if ID is not None and ID != "":
                         idList.append(ID.strip())
-        
+        # print("idList is: ", idList)
         excludeIDListUnderscore = [s.replace(":", "_") for s in excludeIDList]
         dotStr = ontodb.getDotForMultipleIDs(repos, idList, excludeIDListUnderscore).to_string()
 
