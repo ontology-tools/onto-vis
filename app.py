@@ -134,25 +134,68 @@ class OntologyDataStore:
                         if plabel and plabel.strip() in self.label_to_id:
                             self.graphs[repo].add_edge(self.label_to_id[plabel.strip()],
                                                     classId.replace(":", "_"), dir="back")
+                            # print("ADDING PRIMARY EDGE")
                     axioms = self.releases[repo].get_axioms_for_iri(classIri) # other relationships
+
+                    ######################## testing 'AxiomKind::SubClassOf': ####################################
                     for a in axioms:
+                        # print("AXIOM LOOKING AT: ", a)
                         # Example: ['SubClassOf', 'http://purl.obolibrary.org/obo/CHEBI_27732', ['ObjectSomeValuesFrom', 'http://purl.obolibrary.org/obo/RO_0000087', 'http://purl.obolibrary.org/obo/CHEBI_60809']]
-                        if len(a) == 3 and a[0]=='SubClassOf' \
+                        if len(a) == 3 and a[0]=='AxiomKind::SubClassOf' \
                             and isinstance(a[2], list) and len(a[2])==3 \
                             and a[2][0]=='ObjectSomeValuesFrom':
-                            relIri = a[2][1]
+                            relIri = a[2][1][1] # this is a list, expected string? # todo: parse list
                             targetIri = a[2][2]
-                            rel_name = self.releases[repo].get_annotation(relIri, app.config['RDFSLABEL'])
-                            targetLabel = self.releases[repo].get_annotation(targetIri, app.config['RDFSLABEL'])
-                            if targetLabel and targetLabel.strip() in self.label_to_id:
-                                if rel_name in OntologyDataStore.rel_cols:
-                                    rcolour = OntologyDataStore.rel_cols[rel_name]
+                            if isinstance(relIri, list) or isinstance(targetIri, list): # todo: list of targets, deal with them?                            
+                                # can't deal with lists yet, ignore them:
+                                print("relIri: ", relIri, ", targetIri: ", targetIri)
+                            else:  
+                                rel_name = self.releases[repo].get_annotation(relIri, app.config['RDFSLABEL'])
+                                targetLabel = self.releases[repo].get_annotation(targetIri, app.config['RDFSLABEL'])
+                                if rel_name is None:
+                                    print("None") # if None, ignore:
+                                    pass
                                 else:
-                                    rcolour = "orange"
-                                self.graphs[repo].add_edge(classId.replace(":", "_"),
-                                                        self.label_to_id[targetLabel.strip()],
-                                                        color=rcolour,
-                                                        label=rel_name)
+                                    # print("SHOULD HAVE REL_NAME", rel_name, " to target: ", targetLabel)
+                                    if targetLabel and targetLabel.strip() in self.label_to_id: # test eliminate self referencing edges
+                                        if classId.replace(":", "_") == self.label_to_id[targetLabel.strip()]:
+                                            pass
+                                        else: 
+                                            print("SHOULD add edge here: ", classId.replace(":", "_"), " to target: ", self.label_to_id[targetLabel.strip()])
+                                            if rel_name in OntologyDataStore.rel_cols:
+                                                rcolour = OntologyDataStore.rel_cols[rel_name]
+                                            else:
+                                                rcolour = "orange"
+                                            self.graphs[repo].add_edge(classId.replace(":", "_"),
+                                                                    self.label_to_id[targetLabel.strip()],
+                                                                    color=rcolour,
+                                                                    label=rel_name)
+                                            print("adding SubClassOf edge: ", rel_name, " for labels: ", self.label_to_id[targetLabel.strip()], " and ", classId.replace(":", "_"))                                
+                    
+                    ################################## END TEST #####################################
+                    
+                    # for a in axioms:
+                    #     # print("AXIOM LOOKING AT: ", a)
+                    #     # Example: ['SubClassOf', 'http://purl.obolibrary.org/obo/CHEBI_27732', ['ObjectSomeValuesFrom', 'http://purl.obolibrary.org/obo/RO_0000087', 'http://purl.obolibrary.org/obo/CHEBI_60809']]
+                    #     if len(a) == 3 and a[0]=='SubClassOf' \
+                    #         and isinstance(a[2], list) and len(a[2])==3 \
+                    #         and a[2][0]=='ObjectSomeValuesFrom':
+                    #         relIri = a[2][1]
+                    #         targetIri = a[2][2]
+                    #         rel_name = self.releases[repo].get_annotation(relIri, app.config['RDFSLABEL'])
+                    #         targetLabel = self.releases[repo].get_annotation(targetIri, app.config['RDFSLABEL'])
+                    #         print("SHOULD HAVE REL_NAME", rel_name)
+                    #         if targetLabel and targetLabel.strip() in self.label_to_id:
+                    #             print("SHOULD ADD EDGE HERE!")
+                    #             if rel_name in OntologyDataStore.rel_cols:
+                    #                 rcolour = OntologyDataStore.rel_cols[rel_name]
+                    #             else:
+                    #                 rcolour = "orange"
+                    #             self.graphs[repo].add_edge(classId.replace(":", "_"),
+                    #                                     self.label_to_id[targetLabel.strip()],
+                    #                                     color=rcolour,
+                    #                                     label=rel_name)
+                    #             print("adding SubClassOf edge: ", rel_name)
 
     def getReleaseLabels(self, repo):
         all_labels = set()
