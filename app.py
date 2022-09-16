@@ -144,16 +144,20 @@ class OntologyDataStore:
                         if len(a) == 3 and a[0]=='AxiomKind::SubClassOf' \
                             and isinstance(a[2], list) and len(a[2])==3 \
                             and a[2][0]=='ObjectSomeValuesFrom':
-                            relIri = a[2][1][1] # this is a list, expected string? # todo: parse list
+                            relIri = a[2][1][1] # this is a list, expected string? # todo: not a string?
+                            # print("relIri list: ", a[2][1])
                             targetIri = a[2][2]
-                            if isinstance(relIri, list) or isinstance(targetIri, list): # todo: list of targets, deal with them?                            
+                            if isinstance(targetIri, list): # todo: list of targets, deal with them? 
                                 # can't deal with lists yet, ignore them:
-                                print("relIri: ", relIri, ", targetIri: ", targetIri)
-                            else:  
+                                print("GOT LIST! relIri: ", relIri, ", targetIri: ", targetIri)
+                                # print("AXIOM LOOKING AT: ", a)
+                            else: 
+                                # print("NOT LIST! relIri: ", relIri, ", targetIri: ", targetIri)
+                                # print("AXIOM LOOKING AT: ", a)
                                 rel_name = self.releases[repo].get_annotation(relIri, app.config['RDFSLABEL'])
                                 targetLabel = self.releases[repo].get_annotation(targetIri, app.config['RDFSLABEL'])
                                 if rel_name is None:
-                                    print("None") # if None, ignore:
+                                    # print("None") # if None, ignore:
                                     pass
                                 else:
                                     # print("SHOULD HAVE REL_NAME", rel_name, " to target: ", targetLabel)
@@ -161,7 +165,7 @@ class OntologyDataStore:
                                         if classId.replace(":", "_") == self.label_to_id[targetLabel.strip()]:
                                             pass
                                         else: 
-                                            print("SHOULD add edge here: ", classId.replace(":", "_"), " to target: ", self.label_to_id[targetLabel.strip()])
+                                            # print("SHOULD add edge here: ", classId.replace(":", "_"), " to target: ", self.label_to_id[targetLabel.strip()])
                                             if rel_name in OntologyDataStore.rel_cols:
                                                 rcolour = OntologyDataStore.rel_cols[rel_name]
                                             else:
@@ -170,7 +174,7 @@ class OntologyDataStore:
                                                                     self.label_to_id[targetLabel.strip()],
                                                                     color=rcolour,
                                                                     label=rel_name)
-                                            print("adding SubClassOf edge: ", rel_name, " for labels: ", self.label_to_id[targetLabel.strip()], " and ", classId.replace(":", "_"))                                
+                                            # print("adding SubClassOf edge: ", rel_name, " for labels: ", self.label_to_id[targetLabel.strip()], " and ", classId.replace(":", "_"))                                
                     
                     ################################## END TEST #####################################
                     
