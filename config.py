@@ -48,7 +48,9 @@ PREFIXES = [ ["ADDICTO","http://addictovocab.org/ADDICTO_"],
              ["APOLLO_SV","http://purl.obolibrary.org/obo/APOLLO_SV_"],
              ["PDRO","http://purl.obolibrary.org/obo/PDRO_"],
              ["GAZ","http://purl.obolibrary.org/obo/GAZ_"],
-             ["GSSO","http://purl.obolibrary.org/obo/GSSO_"]
+             ["GSSO","http://purl.obolibrary.org/obo/GSSO_"], 
+             ["GO","http://purl.obolibrary.org/obo/GO_"],
+             ["NBO","http://purl.obolibrary.org/obo/NBO_"]
            ]
 
 RDFSLABEL = "http://www.w3.org/2000/01/rdf-schema#label"
