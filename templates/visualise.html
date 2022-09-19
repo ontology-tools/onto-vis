@@ -80,8 +80,14 @@
     var img1 = new Image();
 
     //zoom canvas code from https://stackoverflow.com/questions/3420975/html5-canvas-zooming
-    function draw(scale, translatePos, dot) {
+    function draw(scale, translatePos, dot, zoom) {
         // console.log("drawing: " + dot);
+        // console.log("zoom is: " + zoom); //todo: zoom offset now implemented yet
+        if (zoom == 0){
+
+        } else{
+            // console.log("work out translatePos according to zoom here"); 
+        }
         var canvas = document.getElementById("myCanvas");
         var context = canvas.getContext("2d");
         context.clearRect(0, 0, canvas.width, canvas.height);
@@ -105,7 +111,8 @@
                 img1.onload = function () {
                     //resize canvas if image is larger than screen
                     //or resize canvas to size of screen if image is smaller.. 
-                    //todo: this is not working correctly in Chrome - fix!
+                    //todo: this is different in Chrome vs Firefox!
+                    //canvas needs to be relative to svg size (this)
                     if (this.naturalWidth > window.screen.availWidth && this.naturalHeight > window.screen.availHeight) {
                         canvas.width = this.naturalWidth;
                         canvas.height = this.naturalHeight;
@@ -116,7 +123,7 @@
                             // console.log("width >");
                         } else if (this.naturalHeight > window.screen.availHeight) {
                             canvas.height = this.naturalHeight;
-                            console.log("height >");
+                            // console.log("height >");
                         } else {
                             canvas.width = window.screen.availWidth;
                             canvas.height = window.screen.availHeight;
@@ -129,10 +136,9 @@
                     } else{
                         canvas.width = window.screen.availWidth;
                         canvas.height = window.screen.availHeight;
-                        // canvas.width = 1500;
-                        // canvas.height = 500;
                         console.log("widthNew: " + canvas.width + ", heightNew: " + canvas.height);
-                        context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, 10000*scale, 800*scale);                    }
+                        context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, 5000*scale, 800*scale);                    
+                    }
                     // DOMURL.revokeObjectURL(url); //no we need url for updates to canvas
                 }
                 img1.src = url;
@@ -142,10 +148,24 @@
             });
         } else {
             if(img1.width < 10000){
-                context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, img1.width * scale, img1.height * scale);
-            } else{
-                context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, 10000*scale, 800*scale);
-            }
+                    context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, img1.width * scale, img1.height * scale);
+                } else{
+                    context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, 5000*scale, 800*scale);
+                } 
+            //todo: zoom function not correct: 
+            // if(zoom == 0){
+            //     if(img1.width < 10000){
+            //         context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, img1.width * scale, img1.height * scale);
+            //     } else{
+            //         context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, 5000*scale, 800*scale);
+            //     } 
+            // } else{
+            //     if(img1.width < 10000){
+            //         context.drawImage(img1, 0, 0, img1.width, img1.height, zoom*(img1.width), zoom*(img1.height), img1.width * scale, img1.height * scale);
+            //     } else{
+            //         context.drawImage(img1, 0, 0, img1.width, img1.height, zoom*(5000), zoom*(800), 5000*scale, 800*scale);
+            //     }
+            // }            
         }
     }
 
@@ -173,12 +193,12 @@
         document.getElementById("plus").addEventListener("click", function () {
             scale /= scaleMultiplier;
 
-            draw(scale, translatePos, dots[current_dot]);
+            draw(scale, translatePos, dots[current_dot], 1-scaleMultiplier);
         }, false);
 
         document.getElementById("minus").addEventListener("click", function () {
             scale *= scaleMultiplier;
-            draw(scale, translatePos, dots[current_dot]);
+            draw(scale, translatePos, dots[current_dot], -(1-scaleMultiplier));
         }, false);
 
 
@@ -206,11 +226,11 @@
             if (mouseDown) {
                 translatePos.x = evt.clientX - startDragOffset.x;
                 translatePos.y = evt.clientY - startDragOffset.y;
-                draw(scale, translatePos, dots[current_dot]);
+                draw(scale, translatePos, dots[current_dot], 0);
             } 
         });
 
-        draw(scale, translatePos, dots[current_dot]);
+        draw(scale, translatePos, dots[current_dot], 0);
 
         document.getElementById("download").addEventListener("click", function () {
             // console.log("download clicked");
