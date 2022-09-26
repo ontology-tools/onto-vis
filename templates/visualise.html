@@ -8,9 +8,13 @@
 
 <style>
     body {
-        margin: 0px;
-        padding: 0px;
+        background:#eee; margin:1em; text-align:center;
+		
+        /* margin: 0px;
+        padding: 0px; */
     }
+
+    canvas { display:block; margin:1em auto; background:#fff; border:1px solid #ccc }
 
     #wrapper {
         position: relative;
@@ -21,18 +25,18 @@
         left: 0px;
     }
 
-    #buttonWrapper {
+    /* #buttonWrapper {
         position: fixed;
         width: 30px;
         top: 160px;
         left: 40px;
-    }
+    } */
 
     #downloadWrapper {
         position: fixed;
         width: 500px;
         top: 170px;
-        left: 100px;
+        left: 10px;
     }
    
 </style>
@@ -56,10 +60,10 @@
     <!-- todo: move all styles inline, or at least remove redundancies -->
     <div id="wrapper">
         <canvas id="myCanvas" width="1920" height="1080"></canvas>
-        <div id="buttonWrapper">
+        <!-- <div id="buttonWrapper">
             <button id="plus" class="btn btn-outline-dark btn-sm"><i class="fas fa-plus"></i></button>
             <button id="minus" class="btn btn-outline-dark btn-sm"><i class="fas fa-minus"></i></button>
-        </div>
+        </div> -->
         <div id="downloadWrapper">
             <input type="button" id="download" class="btn btn-outline-dark" value="Download Visualisation">
             <p id="filterMessage"></p>
@@ -76,24 +80,119 @@
 <script>
 
 
-    var loaded = false;
-    var img1 = new Image();
+    // var loaded = false;
+    // var img1 = new Image();
 
-    //zoom canvas code from https://stackoverflow.com/questions/3420975/html5-canvas-zooming
-    function draw(scale, translatePos, dot, zoom) {
-        // console.log("drawing: " + dot);
-        // console.log("zoom is: " + zoom); //todo: zoom offset now implemented yet
-        if (zoom == 0){
+    // //zoom canvas code from https://stackoverflow.com/questions/3420975/html5-canvas-zooming
+    // function draw(scale, translatePos, dot, zoom) {
+    //     // console.log("drawing: " + dot);
+    //     // console.log("zoom is: " + zoom); //todo: zoom offset now implemented yet
+    //     if (zoom == 0){
 
-        } else{
-            // console.log("work out translatePos according to zoom here"); 
-        }
+    //     } else{
+    //         // console.log("work out translatePos according to zoom here"); 
+    //     }
+    //     var canvas = document.getElementById("myCanvas");
+    //     var context = canvas.getContext("2d");
+    //     context.clearRect(0, 0, canvas.width, canvas.height);
+
+    //     if (!loaded) {
+    //         var dotStr = dot;
+    //         // console.log(dotStr.replace(/\s+/g, '').trim());
+    //         //check for empty digigraph: 
+    //         if(dotStr.replace(/\s+/g, '').trim() == "digraph{}"){
+    //             console.log("Empty digigraph found");
+    //             $("#error-message").text("No data for graph visualisation - try again with different ID's");
+    //             $("#error-message").css('background-color', 'red');
+    //         }
+    //         // Asynchronous call to layout
+    //         hpccWasm.graphviz.layout(dotStr, "svg", "dot").then(svg => {
+    //             var data = svg;
+    //             var DOMURL = window.URL || window.webkitURL || window;
+
+    //             var svg = new Blob([data], { type: 'image/svg+xml' });
+    //             var url = DOMURL.createObjectURL(svg);
+    //             img1.onload = function () {
+
+    //             }
+    //             });
+    //     }
+                    //resize canvas if image is larger than screen
+                    //or resize canvas to size of screen if image is smaller.. 
+                    //todo: this is different in Chrome vs Firefox!
+                    //canvas needs to be relative to svg size (this)
+        //             if (this.naturalWidth > window.screen.availWidth && this.naturalHeight > window.screen.availHeight) {
+        //                 canvas.width = this.naturalWidth;
+        //                 canvas.height = this.naturalHeight;
+        //                 // console.log("width and height >");
+        //             } else {
+        //                 if (this.naturalWidth > window.screen.availWidth) {
+        //                     canvas.width = this.naturalWidth;
+        //                     // console.log("width >");
+        //                 } else if (this.naturalHeight > window.screen.availHeight) {
+        //                     canvas.height = this.naturalHeight;
+        //                     // console.log("height >");
+        //                 } else {
+        //                     canvas.width = window.screen.availWidth;
+        //                     canvas.height = window.screen.availHeight;
+        //                     // console.log("width, height <");
+        //                 }
+        //             }
+        //             // console.log("width: " + canvas.width + ", height: " + canvas.height);
+        //             if(canvas.width < 10000){
+        //                 context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, img1.width * scale, img1.height * scale);
+        //             } else{
+        //                 canvas.width = window.screen.availWidth;
+        //                 canvas.height = window.screen.availHeight;
+        //                 console.log("widthNew: " + canvas.width + ", heightNew: " + canvas.height);
+        //                 context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, 5000*scale, 800*scale);                    
+        //             }
+        //             // DOMURL.revokeObjectURL(url); //no we need url for updates to canvas
+        //         }
+        //         img1.src = url;
+        //         loaded = true;
+
+
+        //     });
+        // } else {
+        //     if(img1.width < 10000){
+        //             context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, img1.width * scale, img1.height * scale);
+        //         } else{
+        //             context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, 5000*scale, 800*scale);
+        //         } 
+                   
+        // }
+    // }
+
+    window.onload = function () {
+        var current_dot = 0;
+        var dots = [];        
+        var default_dot = `{{ dotStr | safe}}`
+        //todo: dots[] not necessary, replace all with default_dot?     
+        dots.push(default_dot);
+        
+
         var canvas = document.getElementById("myCanvas");
-        var context = canvas.getContext("2d");
-        context.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.width = 1920;
+        canvas.height = 1080;
 
-        if (!loaded) {
-            var dotStr = dot;
+        var ctx = canvas.getContext('2d');
+        trackTransforms(ctx);
+      
+function redraw(){
+
+      // Clear the entire canvas
+      var p1 = ctx.transformedPoint(0,0);
+      var p2 = ctx.transformedPoint(canvas.width,canvas.height);
+      ctx.clearRect(p1.x,p1.y,p2.x-p1.x,p2.y-p1.y);
+
+      ctx.save();
+      ctx.setTransform(1,0,0,1,0,0);
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.restore();
+        img1 = new Image();
+        // img1.src = url;
+      var dotStr = dots[current_dot];
             // console.log(dotStr.replace(/\s+/g, '').trim());
             //check for empty digigraph: 
             if(dotStr.replace(/\s+/g, '').trim() == "digraph{}"){
@@ -108,129 +207,117 @@
 
                 var svg = new Blob([data], { type: 'image/svg+xml' });
                 var url = DOMURL.createObjectURL(svg);
-                img1.onload = function () {
-                    //resize canvas if image is larger than screen
-                    //or resize canvas to size of screen if image is smaller.. 
-                    //todo: this is different in Chrome vs Firefox!
-                    //canvas needs to be relative to svg size (this)
-                    if (this.naturalWidth > window.screen.availWidth && this.naturalHeight > window.screen.availHeight) {
-                        canvas.width = this.naturalWidth;
-                        canvas.height = this.naturalHeight;
-                        // console.log("width and height >");
-                    } else {
-                        if (this.naturalWidth > window.screen.availWidth) {
-                            canvas.width = this.naturalWidth;
-                            // console.log("width >");
-                        } else if (this.naturalHeight > window.screen.availHeight) {
-                            canvas.height = this.naturalHeight;
-                            // console.log("height >");
-                        } else {
-                            canvas.width = window.screen.availWidth;
-                            canvas.height = window.screen.availHeight;
-                            // console.log("width, height <");
-                        }
-                    }
-                    // console.log("width: " + canvas.width + ", height: " + canvas.height);
-                    if(canvas.width < 10000){
-                        context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, img1.width * scale, img1.height * scale);
-                    } else{
-                        canvas.width = window.screen.availWidth;
-                        canvas.height = window.screen.availHeight;
-                        console.log("widthNew: " + canvas.width + ", heightNew: " + canvas.height);
-                        context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, 5000*scale, 800*scale);                    
-                    }
-                    // DOMURL.revokeObjectURL(url); //no we need url for updates to canvas
-                }
                 img1.src = url;
-                loaded = true;
+                img1.onload = function () {
+                    ctx.drawImage(img1,0,0);
+                }
+                });
+      
 
-
-            });
-        } else {
-            if(img1.width < 10000){
-                    context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, img1.width * scale, img1.height * scale);
-                } else{
-                    context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, 5000*scale, 800*scale);
-                } 
-            //todo: zoom function not correct: 
-            // if(zoom == 0){
-            //     if(img1.width < 10000){
-            //         context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, img1.width * scale, img1.height * scale);
-            //     } else{
-            //         context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, 5000*scale, 800*scale);
-            //     } 
-            // } else{
-            //     if(img1.width < 10000){
-            //         context.drawImage(img1, 0, 0, img1.width, img1.height, zoom*(img1.width), zoom*(img1.height), img1.width * scale, img1.height * scale);
-            //     } else{
-            //         context.drawImage(img1, 0, 0, img1.width, img1.height, zoom*(5000), zoom*(800), 5000*scale, 800*scale);
-            //     }
-            // }            
-        }
     }
+    redraw();
 
-    window.onload = function () {
-        var current_dot = 0;
-        var dots = [];        
-        var default_dot = `{{ dotStr | safe}}`
-        //todo: dots[] not necessary, replace all with default_dot?     
-        dots.push(default_dot);
-        
+  var lastX=canvas.width/2, lastY=canvas.height/2;
 
-        var canvas = document.getElementById("myCanvas");
+  var dragStart,dragged;
 
-        var translatePos = {
-            x: 0,
-            y: 0
-        };
+  canvas.addEventListener('mousedown',function(evt){
+      document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
+      lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+      lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
+      dragStart = ctx.transformedPoint(lastX,lastY);
+      dragged = false;
+  },false);
 
-        var scale = 1.0;
-        var scaleMultiplier = 0.8;
-        var startDragOffset = {};
-        var mouseDown = false;
+  canvas.addEventListener('mousemove',function(evt){
+      lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+      lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
+      dragged = true;
+      if (dragStart){
+        var pt = ctx.transformedPoint(lastX,lastY);
+        ctx.translate(pt.x-dragStart.x,pt.y-dragStart.y);
+        redraw();
+            }
+  },false);
 
-        // add button event listeners
-        document.getElementById("plus").addEventListener("click", function () {
-            scale /= scaleMultiplier;
+  canvas.addEventListener('mouseup',function(evt){
+      dragStart = null;
+      if (!dragged) zoom(evt.shiftKey ? -1 : 1 );
+  },false);
 
-            draw(scale, translatePos, dots[current_dot], 1-scaleMultiplier);
-        }, false);
+  var scaleFactor = 1.1;
 
-        document.getElementById("minus").addEventListener("click", function () {
-            scale *= scaleMultiplier;
-            draw(scale, translatePos, dots[current_dot], -(1-scaleMultiplier));
-        }, false);
+  var zoom = function(clicks){
+      var pt = ctx.transformedPoint(lastX,lastY);
+      ctx.translate(pt.x,pt.y);
+      var factor = Math.pow(scaleFactor,clicks);
+      ctx.scale(factor,factor);
+      ctx.translate(-pt.x,-pt.y);
+      redraw();
+  }
+
+  var handleScroll = function(evt){
+      var delta = evt.wheelDelta ? evt.wheelDelta/40 : evt.detail ? -evt.detail : 0;
+      if (delta) zoom(delta);
+      return evt.preventDefault() && false;
+  };
+
+  canvas.addEventListener('DOMMouseScroll',handleScroll,false);
+  canvas.addEventListener('mousewheel',handleScroll,false);
+};
+
+        // var translatePos = {
+        //     x: 0,
+        //     y: 0
+        // };
+
+        // var scale = 1.0;
+        // var scaleMultiplier = 0.8;
+        // var startDragOffset = {};
+        // var mouseDown = false;
+
+        // // add button event listeners
+        // document.getElementById("plus").addEventListener("click", function () {
+        //     scale /= scaleMultiplier;
+
+        //     draw(scale, translatePos, dots[current_dot], 1-scaleMultiplier);
+        // }, false);
+
+        // document.getElementById("minus").addEventListener("click", function () {
+        //     scale *= scaleMultiplier;
+        //     draw(scale, translatePos, dots[current_dot], -(1-scaleMultiplier));
+        // }, false);
 
 
 
-        // add event listeners to handle screen drag
-        canvas.addEventListener("mousedown", function (evt) {
-            mouseDown = true;
-            startDragOffset.x = evt.clientX - translatePos.x;
-            startDragOffset.y = evt.clientY - translatePos.y;
-        });
+        // // add event listeners to handle screen drag
+        // canvas.addEventListener("mousedown", function (evt) {
+        //     mouseDown = true;
+        //     startDragOffset.x = evt.clientX - translatePos.x;
+        //     startDragOffset.y = evt.clientY - translatePos.y;
+        // });
 
-        canvas.addEventListener("mouseup", function (evt) {
-            mouseDown = false;
-        });
+        // canvas.addEventListener("mouseup", function (evt) {
+        //     mouseDown = false;
+        // });
 
-        canvas.addEventListener("mouseover", function (evt) {
-            mouseDown = false;
-        });
+        // canvas.addEventListener("mouseover", function (evt) {
+        //     mouseDown = false;
+        // });
 
-        canvas.addEventListener("mouseout", function (evt) {
-            mouseDown = false;
-        });
+        // canvas.addEventListener("mouseout", function (evt) {
+        //     mouseDown = false;
+        // });
 
-        canvas.addEventListener("mousemove", function (evt) {
-            if (mouseDown) {
-                translatePos.x = evt.clientX - startDragOffset.x;
-                translatePos.y = evt.clientY - startDragOffset.y;
-                draw(scale, translatePos, dots[current_dot], 0);
-            } 
-        });
+        // canvas.addEventListener("mousemove", function (evt) {
+        //     if (mouseDown) {
+        //         translatePos.x = evt.clientX - startDragOffset.x;
+        //         translatePos.y = evt.clientY - startDragOffset.y;
+        //         draw(scale, translatePos, dots[current_dot], 0);
+        //     } 
+        // });
 
-        draw(scale, translatePos, dots[current_dot], 0);
+        // draw(scale, translatePos, dots[current_dot], 0);
 
         document.getElementById("download").addEventListener("click", function () {
             // console.log("download clicked");
@@ -255,6 +342,71 @@
                 DOMURL.revokeObjectURL(url2);
             });
         });    
+
+    
+
+    // Adds ctx.getTransform() - returns an SVGMatrix
+// Adds ctx.transformedPoint(x,y) - returns an SVGPoint
+function trackTransforms(ctx){
+  var svg = document.createElementNS("http://www.w3.org/2000/svg",'svg');
+  var xform = svg.createSVGMatrix();
+  ctx.getTransform = function(){ return xform; };
+
+  var savedTransforms = [];
+  var save = ctx.save;
+  ctx.save = function(){
+      savedTransforms.push(xform.translate(0,0));
+      return save.call(ctx);
+  };
+
+  var restore = ctx.restore;
+  ctx.restore = function(){
+    xform = savedTransforms.pop();
+    return restore.call(ctx);
+          };
+
+  var scale = ctx.scale;
+  ctx.scale = function(sx,sy){
+    xform = xform.scaleNonUniform(sx,sy);
+    return scale.call(ctx,sx,sy);
+          };
+
+  var rotate = ctx.rotate;
+  ctx.rotate = function(radians){
+      xform = xform.rotate(radians*180/Math.PI);
+      return rotate.call(ctx,radians);
+  };
+
+  var translate = ctx.translate;
+  ctx.translate = function(dx,dy){
+      xform = xform.translate(dx,dy);
+      return translate.call(ctx,dx,dy);
+  };
+
+  var transform = ctx.transform;
+  ctx.transform = function(a,b,c,d,e,f){
+      var m2 = svg.createSVGMatrix();
+      m2.a=a; m2.b=b; m2.c=c; m2.d=d; m2.e=e; m2.f=f;
+      xform = xform.multiply(m2);
+      return transform.call(ctx,a,b,c,d,e,f);
+  };
+
+  var setTransform = ctx.setTransform;
+  ctx.setTransform = function(a,b,c,d,e,f){
+      xform.a = a;
+      xform.b = b;
+      xform.c = c;
+      xform.d = d;
+      xform.e = e;
+      xform.f = f;
+      return setTransform.call(ctx,a,b,c,d,e,f);
+  };
+
+  var pt  = svg.createSVGPoint();
+  ctx.transformedPoint = function(x,y){
+      pt.x=x; pt.y=y;
+      return pt.matrixTransform(xform.inverse());
+  }
 }
 
 </script>
