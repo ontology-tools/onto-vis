@@ -165,6 +165,8 @@
     // }
 
     window.onload = function () {
+        var loaded = false;
+        img1 = new Image();
         var current_dot = 0;
         var dots = [];        
         var default_dot = `{{ dotStr | safe}}`
@@ -190,7 +192,8 @@ function redraw(){
       ctx.setTransform(1,0,0,1,0,0);
       ctx.clearRect(0,0,canvas.width,canvas.height);
       ctx.restore();
-        img1 = new Image();
+      if (!loaded){     
+        
         // img1.src = url;
       var dotStr = dots[current_dot];
             // console.log(dotStr.replace(/\s+/g, '').trim());
@@ -210,8 +213,13 @@ function redraw(){
                 img1.src = url;
                 img1.onload = function () {
                     ctx.drawImage(img1,0,0);
+                    loaded = false;
                 }
                 });
+            } else{
+                // ctx.drawImage(img1,0,0);
+            }
+            
       
 
     }
