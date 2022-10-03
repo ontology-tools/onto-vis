@@ -194,7 +194,7 @@
       ctx.setTransform(1,0,0,1,0,0);
       ctx.clearRect(0,0,canvas.width,canvas.height);
       ctx.restore();
-      if (!loaded){     
+      if (!loaded){   // loaded var is false for first load only - loading graphviz layout here once only
         console.log("not loaded");
         // img1.src = url;
       var dotStr = dots[current_dot];
@@ -214,16 +214,22 @@
                 var url = DOMURL.createObjectURL(svg);
                 img1.src = url;
                 img1.onload = function () {
-                    ctx.drawImage(img1,0,0);
+                    if(img1.width > 1200 || img1.height > 800){
+                        ctx.scale(0.5, 0.5); //50% size on first load
+                        ctx.drawImage(img1,(-img1.width/2) + 600,(-img1.height/2) + 400); //center large image
+                    } else{
+                        ctx.drawImage(img1,0, 0);
+                    }
                     loaded = true;
                 }
-                });
+            });
+        } else{
+            if(img1.width > 1200 || img1.height > 800){
+                ctx.drawImage(img1,(-img1.width/2) + 600,(-img1.height/2) + 400); //center large image
             } else{
-                ctx.drawImage(img1,0,0);
-            }
-            
-      
-
+                ctx.drawImage(img1,0, 0);
+            }            
+        }
     }
     redraw();
 
@@ -274,7 +280,7 @@
 
   canvas.addEventListener('DOMMouseScroll',handleScroll,false);
   canvas.addEventListener('mousewheel',handleScroll,false);
-};
+
 
         // var translatePos = {
         //     x: 0,
@@ -344,7 +350,8 @@
                     let a = document.createElement('a');
                     a.href = url2;
                     //change to .svg:
-                    a.download = img_name.slice(0, -5) + ".svg";
+                    // a.download = img_name.slice(0, -5) + ".svg";
+                    a.download = img_name + ".svg";
                     document.body.appendChild(a);
                     a.click();
                 }
@@ -353,7 +360,7 @@
             });
         });    
 
-    
+};   
 
     // Adds ctx.getTransform() - returns an SVGMatrix
 // Adds ctx.transformedPoint(x,y) - returns an SVGPoint
