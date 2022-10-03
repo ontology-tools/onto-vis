@@ -19,8 +19,8 @@
     #wrapper {
         position: relative;
         border: 0px;
-        width: 1920px;
-        height: 1080px;
+        width: 1200px;
+        height: 800px;
         top: 80px;
         left: 0px;
     }
@@ -59,7 +59,7 @@
 <div onmousedown="return false;">
     <!-- todo: move all styles inline, or at least remove redundancies -->
     <div id="wrapper">
-        <canvas id="myCanvas" width="1920" height="1080"></canvas>
+        <canvas id="myCanvas" width="1200" height="800"></canvas>
         <!-- <div id="buttonWrapper">
             <button id="plus" class="btn btn-outline-dark btn-sm"><i class="fas fa-plus"></i></button>
             <button id="minus" class="btn btn-outline-dark btn-sm"><i class="fas fa-minus"></i></button>
@@ -175,17 +175,19 @@
         
 
         var canvas = document.getElementById("myCanvas");
-        canvas.width = 1920;
-        canvas.height = 1080;
+        canvas.width = 1200;
+        canvas.height = 800;
 
         var ctx = canvas.getContext('2d');
         trackTransforms(ctx);
-      
-function redraw(){
+
+        var p1 = ctx.transformedPoint(0,0);
+        var p2 = ctx.transformedPoint(canvas.width,canvas.height);
+
+    function redraw(){
 
       // Clear the entire canvas
-      var p1 = ctx.transformedPoint(0,0);
-      var p2 = ctx.transformedPoint(canvas.width,canvas.height);
+      
       ctx.clearRect(p1.x,p1.y,p2.x-p1.x,p2.y-p1.y);
 
       ctx.save();
@@ -193,7 +195,7 @@ function redraw(){
       ctx.clearRect(0,0,canvas.width,canvas.height);
       ctx.restore();
       if (!loaded){     
-        
+        console.log("not loaded");
         // img1.src = url;
       var dotStr = dots[current_dot];
             // console.log(dotStr.replace(/\s+/g, '').trim());
@@ -213,11 +215,11 @@ function redraw(){
                 img1.src = url;
                 img1.onload = function () {
                     ctx.drawImage(img1,0,0);
-                    loaded = false;
+                    loaded = true;
                 }
                 });
             } else{
-                // ctx.drawImage(img1,0,0);
+                ctx.drawImage(img1,0,0);
             }
             
       
