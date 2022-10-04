@@ -10,8 +10,6 @@
     body {
         background:#eee; margin:1em; text-align:center;
 		
-        /* margin: 0px;
-        padding: 0px; */
     }
 
     canvas { display:block; margin:1em auto; background:#fff; border:1px solid #ccc }
@@ -24,13 +22,6 @@
         top: 80px;
         left: 0px;
     }
-
-    /* #buttonWrapper {
-        position: fixed;
-        width: 30px;
-        top: 160px;
-        left: 40px;
-    } */
 
     #downloadWrapper {
         position: fixed;
@@ -60,10 +51,6 @@
     <!-- todo: move all styles inline, or at least remove redundancies -->
     <div id="wrapper">
         <canvas id="myCanvas" width="1200" height="800"></canvas>
-        <!-- <div id="buttonWrapper">
-            <button id="plus" class="btn btn-outline-dark btn-sm"><i class="fas fa-plus"></i></button>
-            <button id="minus" class="btn btn-outline-dark btn-sm"><i class="fas fa-minus"></i></button>
-        </div> -->
         <div id="downloadWrapper">
             <input type="button" id="download" class="btn btn-outline-dark" value="Download Visualisation">
             <p id="filterMessage"></p>
@@ -72,97 +59,15 @@
     </div>
 </div>
 <!-- WASM GRAPHVIZ -->
+
 <script src="https://cdn.jsdelivr.net/npm/@hpcc-js/wasm@1.7.1/dist/index.min.js"></script>
+
 <script>
     var hpccWasm = window["@hpcc-js/wasm"];
 </script>
 
+<!-- MAIN CODE BLOCK -->
 <script>
-
-
-    // var loaded = false;
-    // var img1 = new Image();
-
-    // //zoom canvas code from https://stackoverflow.com/questions/3420975/html5-canvas-zooming
-    // function draw(scale, translatePos, dot, zoom) {
-    //     // console.log("drawing: " + dot);
-    //     // console.log("zoom is: " + zoom); //todo: zoom offset now implemented yet
-    //     if (zoom == 0){
-
-    //     } else{
-    //         // console.log("work out translatePos according to zoom here"); 
-    //     }
-    //     var canvas = document.getElementById("myCanvas");
-    //     var context = canvas.getContext("2d");
-    //     context.clearRect(0, 0, canvas.width, canvas.height);
-
-    //     if (!loaded) {
-    //         var dotStr = dot;
-    //         // console.log(dotStr.replace(/\s+/g, '').trim());
-    //         //check for empty digigraph: 
-    //         if(dotStr.replace(/\s+/g, '').trim() == "digraph{}"){
-    //             console.log("Empty digigraph found");
-    //             $("#error-message").text("No data for graph visualisation - try again with different ID's");
-    //             $("#error-message").css('background-color', 'red');
-    //         }
-    //         // Asynchronous call to layout
-    //         hpccWasm.graphviz.layout(dotStr, "svg", "dot").then(svg => {
-    //             var data = svg;
-    //             var DOMURL = window.URL || window.webkitURL || window;
-
-    //             var svg = new Blob([data], { type: 'image/svg+xml' });
-    //             var url = DOMURL.createObjectURL(svg);
-    //             img1.onload = function () {
-
-    //             }
-    //             });
-    //     }
-                    //resize canvas if image is larger than screen
-                    //or resize canvas to size of screen if image is smaller.. 
-                    //todo: this is different in Chrome vs Firefox!
-                    //canvas needs to be relative to svg size (this)
-        //             if (this.naturalWidth > window.screen.availWidth && this.naturalHeight > window.screen.availHeight) {
-        //                 canvas.width = this.naturalWidth;
-        //                 canvas.height = this.naturalHeight;
-        //                 // console.log("width and height >");
-        //             } else {
-        //                 if (this.naturalWidth > window.screen.availWidth) {
-        //                     canvas.width = this.naturalWidth;
-        //                     // console.log("width >");
-        //                 } else if (this.naturalHeight > window.screen.availHeight) {
-        //                     canvas.height = this.naturalHeight;
-        //                     // console.log("height >");
-        //                 } else {
-        //                     canvas.width = window.screen.availWidth;
-        //                     canvas.height = window.screen.availHeight;
-        //                     // console.log("width, height <");
-        //                 }
-        //             }
-        //             // console.log("width: " + canvas.width + ", height: " + canvas.height);
-        //             if(canvas.width < 10000){
-        //                 context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, img1.width * scale, img1.height * scale);
-        //             } else{
-        //                 canvas.width = window.screen.availWidth;
-        //                 canvas.height = window.screen.availHeight;
-        //                 console.log("widthNew: " + canvas.width + ", heightNew: " + canvas.height);
-        //                 context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, 5000*scale, 800*scale);                    
-        //             }
-        //             // DOMURL.revokeObjectURL(url); //no we need url for updates to canvas
-        //         }
-        //         img1.src = url;
-        //         loaded = true;
-
-
-        //     });
-        // } else {
-        //     if(img1.width < 10000){
-        //             context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, img1.width * scale, img1.height * scale);
-        //         } else{
-        //             context.drawImage(img1, 0, 0, img1.width, img1.height, translatePos.x, translatePos.y, 5000*scale, 800*scale);
-        //         } 
-                   
-        // }
-    // }
 
     window.onload = function () {
         var loaded = false;
@@ -281,60 +186,6 @@
   canvas.addEventListener('DOMMouseScroll',handleScroll,false);
   canvas.addEventListener('mousewheel',handleScroll,false);
 
-
-        // var translatePos = {
-        //     x: 0,
-        //     y: 0
-        // };
-
-        // var scale = 1.0;
-        // var scaleMultiplier = 0.8;
-        // var startDragOffset = {};
-        // var mouseDown = false;
-
-        // // add button event listeners
-        // document.getElementById("plus").addEventListener("click", function () {
-        //     scale /= scaleMultiplier;
-
-        //     draw(scale, translatePos, dots[current_dot], 1-scaleMultiplier);
-        // }, false);
-
-        // document.getElementById("minus").addEventListener("click", function () {
-        //     scale *= scaleMultiplier;
-        //     draw(scale, translatePos, dots[current_dot], -(1-scaleMultiplier));
-        // }, false);
-
-
-
-        // // add event listeners to handle screen drag
-        // canvas.addEventListener("mousedown", function (evt) {
-        //     mouseDown = true;
-        //     startDragOffset.x = evt.clientX - translatePos.x;
-        //     startDragOffset.y = evt.clientY - translatePos.y;
-        // });
-
-        // canvas.addEventListener("mouseup", function (evt) {
-        //     mouseDown = false;
-        // });
-
-        // canvas.addEventListener("mouseover", function (evt) {
-        //     mouseDown = false;
-        // });
-
-        // canvas.addEventListener("mouseout", function (evt) {
-        //     mouseDown = false;
-        // });
-
-        // canvas.addEventListener("mousemove", function (evt) {
-        //     if (mouseDown) {
-        //         translatePos.x = evt.clientX - startDragOffset.x;
-        //         translatePos.y = evt.clientY - startDragOffset.y;
-        //         draw(scale, translatePos, dots[current_dot], 0);
-        //     } 
-        // });
-
-        // draw(scale, translatePos, dots[current_dot], 0);
-
         document.getElementById("download").addEventListener("click", function () {
             // console.log("download clicked");
             var dotStr2 = dots[current_dot];
@@ -350,7 +201,6 @@
                     let a = document.createElement('a');
                     a.href = url2;
                     //change to .svg:
-                    // a.download = img_name.slice(0, -5) + ".svg";
                     a.download = img_name + ".svg";
                     document.body.appendChild(a);
                     a.click();
@@ -362,7 +212,7 @@
 
 };   
 
-    // Adds ctx.getTransform() - returns an SVGMatrix
+// Adds ctx.getTransform() - returns an SVGMatrix
 // Adds ctx.transformedPoint(x,y) - returns an SVGPoint
 function trackTransforms(ctx){
   var svg = document.createElementNS("http://www.w3.org/2000/svg",'svg');
@@ -427,6 +277,7 @@ function trackTransforms(ctx){
 }
 
 </script>
+
 {% endblock %}
 
 {%block javascript%}
