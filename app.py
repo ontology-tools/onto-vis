@@ -103,10 +103,10 @@ class OntologyDataStore:
         if ontofile:
             try:
                 self.releases[repo] = pyhornedowl.open_ontology(ontofile)
-            except Exception:
+            except Error:
                 print("Got an error when parsing",ontofile)
                 print("Skipping....")
-                return
+                return()
             prefixes = app.config['PREFIXES'] #todo: get these from BSSOFoundry instead of config? 
             for prefix in prefixes:
                 self.releases[repo].add_prefix_mapping(prefix[0],prefix[1])
