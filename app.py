@@ -360,18 +360,12 @@ def get_ids_for_one(current_ontol):
 @app.route('/')
 @app.route('/home')
 def home():
-    ontologies_for_list = repo_names #todo: this is the same as ontologies, refactor? 
+    ontologies = repo_names
     # print("ontologies_for_list: ", ontologies_for_list)
-    labels = get_ids(ontologies_for_list) 
-    label_list = labels
-    ontologies = repo_names # now from BSSOFoundry 
-    # print("ontologies are: ", ontologies)
+    ontologies.remove('TURBBO')  # Take this out when TURBBO parses correctly
+    label_list = get_ids(ontologies)
 
-    #label_list_two: 
-    
-    label_list_two = [["a", "b", "c"], ["d", "e", "f"]] #this is fine..
-
-    return render_template("index.html", label_list=label_list, ontologies=ontologies, label_list_two=label_list_two) 
+    return render_template("index.html", label_list=label_list, ontologies=ontologies)
 
 @app.route('/get_values', methods=['POST', 'GET'])
 def get_values():
