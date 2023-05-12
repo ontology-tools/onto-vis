@@ -316,20 +316,21 @@ def get_ids(ontol_list):
     # for ontol in ontol_list:
     # for repo in app.config['REPOSITORIES']
     for repo in source_repositories:
-        ontol = ontodb.releases[repo]
-        for classIri in ontol.get_classes():
-            # print("for classIri running")        
-            label = ontol.get_annotation(classIri, RDFSLABEL)
-            # print("label: ", label) 
-            if classIri:                
-                classId = str(classIri).rsplit('/', 1)[1].replace('_', ':').strip()
-                # print(classId)
-                if classId and label:
-                    # print("got classId and labels") 
-                    checklist.append(classId + "|"+ label)                   
-                    # print(classId, ": ", label)
-                elif classId:
-                    checklist.append(classId)
+        if repo in ontodb.releases:
+            ontol = ontodb.releases[repo]
+            for classIri in ontol.get_classes():
+                # print("for classIri running")
+                label = ontol.get_annotation(classIri, RDFSLABEL)
+                # print("label: ", label)
+                if classIri:
+                    classId = str(classIri).rsplit('/', 1)[1].replace('_', ':').strip()
+                    # print(classId)
+                    if classId and label:
+                        # print("got classId and labels")
+                        checklist.append(classId + "|"+ label)
+                        # print(classId, ": ", label)
+                    elif classId:
+                        checklist.append(classId)
                     
     return checklist
 
