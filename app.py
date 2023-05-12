@@ -86,8 +86,6 @@ class OntologyDataStore:
             self.parseRelease(repo)
 
     def parseRelease(self,repo):
-        self.graphs[repo] = networkx.MultiDiGraph()
-        self.releasedates[repo] = date.today()
         #print("Release date ",self.releasedates[repo])
         # Get the ontology from the repository
         repositories = source_repositories
@@ -104,9 +102,12 @@ class OntologyDataStore:
             try:
                 self.releases[repo] = pyhornedowl.open_ontology(ontofile)
             except:
-                print("Got an error when parsing",ontofile)
+                print("Got an error when parsing",repo)
                 print("Skipping....")
                 return()
+
+            self.graphs[repo] = networkx.MultiDiGraph()
+            self.releasedates[repo] = date.today()
             prefixes = app.config['PREFIXES'] #todo: get these from BSSOFoundry instead of config? 
             for prefix in prefixes:
                 self.releases[repo].add_prefix_mapping(prefix[0],prefix[1])
