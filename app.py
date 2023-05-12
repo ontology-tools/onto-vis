@@ -60,7 +60,7 @@ for result in linksData:
                 source_url = line.replace("source_url: ", "").strip()
                 # source_urls.append(source_url)
         for line in md_html.split('\n'):
-            if "id: " in line and "- id: " not in line and "orcid" not in line:
+            if "id: " in line and line.startswith("id") and "- id: " not in line and "orcid" not in line:
                 repo_name = line.replace("id: ", "").strip().upper()
                 print("FOUND REPO NAME",repo_name)
                 repo_names.append(repo_name)
