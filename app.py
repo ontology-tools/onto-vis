@@ -53,14 +53,16 @@ for result in linksData:
         pass
     else:
         md_html = requests.get(download_url, headers=headers).text
-        # print(md_html) #full result for testing
+
+        print(md_html) #full result for testing
         for line in md_html.split('\n'):             
             if "source_url: " in line: 
                 source_url = line.replace("source_url: ", "").strip()
                 # source_urls.append(source_url)
         for line in md_html.split('\n'):
             if "id: " in line and "- id: " not in line and "orcid" not in line:
-                repo_name = line.replace("id: ", "").strip().upper()                      
+                repo_name = line.replace("id: ", "").strip().upper()
+                print("FOUND REPO NAME",repo_name)
                 repo_names.append(repo_name)
         # work-around for non-upper AddictO: todo: fix this!
         if repo_name != "ADDICTO":
