@@ -362,7 +362,8 @@ def get_ids_for_one(current_ontol):
 def home():
     ontologies = repo_names
     # print("ontologies_for_list: ", ontologies_for_list)
-    ontologies.remove('TURBBO')  # Take this out when TURBBO parses correctly
+    if 'TURBBO' in ontologies: 
+        ontologies.remove('TURBBO')  # Take this out when TURBBO parses correctly
     label_list = get_ids(ontologies)
 
     return render_template("index.html", label_list=label_list, ontologies=ontologies)
