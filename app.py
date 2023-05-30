@@ -349,11 +349,14 @@ def get_ids_for_one(current_ontol):
             classId = str(classIri).rsplit('/', 1)[1].replace('_', ':').strip()
             # print(classId)
             if classId and label:
-                # print("got classId and labels") 
-                checklist.append(classId + "|"+ label)                   
+                # print("got classId and labels")
+                candidateClassString = classId + "|" + label
+                if candidateClassString not in checklist:
+                    checklist.append(classId + "|"+ label)
                 # print(classId, ": ", label)
             elif classId:
-                checklist.append(classId) 
+                if classId not in checklist:
+                    checklist.append(classId)
                     
     return checklist
 
