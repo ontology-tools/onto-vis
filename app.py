@@ -331,7 +331,7 @@ def get_ids(ontol_list):
                         if candidateClassString not in checklist:
                             checklist.append(candidateClassString)
                         # print(classId, ": ", label)
-                    elif classId: 
+                    elif classId:
                         if classId not in checklist:
                             checklist.append(classId)
                     
