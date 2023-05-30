@@ -80,9 +80,9 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
+      <!--<div class="modal-body">
         Please select one or more ontology
-      </div>
+      </div> -->
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
@@ -90,7 +90,7 @@
   </div>
 </div>
 <h4 style="text-align: center;">
-    Choose your ontology, input a list of IDs below, then press "Submit".
+    Input a list of IDs below, then press "Submit".
 </h4>
 <h4 style="text-align: center;">
     To visualise the full ontology, leave the list of IDs empty.
@@ -100,13 +100,13 @@
     <form  target=”_blank” id="submitText" name="form" method="POST" style="text-align: center;"
     action="/visualise" onsubmit="return required()">
     <div class="col">
-      <div class="card border-secondary mb-3">
-        <!-- <h4>
+      <!--<div class="card border-secondary mb-3">
+         <h4>
           <span class="badge badge-secondary" placeholder="EG: AddictO BCIO" style = "margin-top: 20px;">
               Choice of Ontologies
           </span>
         </h4> -->
-        <input id="ont" value="BCIO" style="hidden" />
+        <input id="repo-text-box" name="repo" value="BCIO" hidden="true" style="display:none;" />
         <!-- <h5 class="card-header">Choice of ontologies</h5>
 
         <div id="ont_div" style=" border-radius: 3px;  padding: 6px 11px; font-size: 24px; text-align: center;">  
@@ -114,9 +114,9 @@
           <input id="{{ont}}" type="checkbox" name="{{ont}}" value="{{ont}}" style = "margin: 0px 10px; position: relative; bottom: 3px;" >{{ont}}
           {% endfor %}
           <input id="repo-text-box" name="repo" value="" hidden="true">
-        </div>   -->
+        </div>
       </div>
-    </div>
+    </div>-->
 
     <div class="container">
       <div class="row">
