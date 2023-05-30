@@ -327,10 +327,13 @@ def get_ids(ontol_list):
                     # print(classId)
                     if classId and label:
                         # print("got classId and labels")
-                        checklist.append(classId + "|"+ label)
+                        candidateClassString = classId + "|" + label
+                        if candidateClassString not in checklist:
+                            checklist.append(candidateClassString)
                         # print(classId, ": ", label)
-                    elif classId:
-                        checklist.append(classId)
+                    elif classId: 
+                        if classId not in checklist:
+                            checklist.append(classId)
                     
     return checklist
 
@@ -352,7 +355,7 @@ def get_ids_for_one(current_ontol):
                 # print("got classId and labels")
                 candidateClassString = classId + "|" + label
                 if candidateClassString not in checklist:
-                    checklist.append(classId + "|"+ label)
+                    checklist.append(candidateClassString)
                 # print(classId, ": ", label)
             elif classId:
                 if classId not in checklist:
