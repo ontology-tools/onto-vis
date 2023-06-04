@@ -96,7 +96,10 @@ class OntologyDataStore:
         print("got location", location)
         data = self.resolve(location) # resolves redirects
         print("got data", data)
-        data = urlopen(location).read()  # .read for bytes - needed? 
+        if data is None:
+            print("Data is none, skipping",repo)
+            return()
+        data = urlopen(location).read()  # .read for bytes - needed?
         ontofile = data.decode('utf-8')
 
         # Parse it
