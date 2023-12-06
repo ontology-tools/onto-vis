@@ -2,8 +2,6 @@ from cProfile import label
 from flask import Flask, request, g, session, redirect, url_for, render_template
 from flask import render_template_string, jsonify, Response, send_file
 from flask_cors import CORS
-# from flask_caching import Cache
-#from flask_github import GitHub
 import pyhornedowl
 import networkx
 import re
@@ -14,8 +12,6 @@ import pydot
 
 import json
 
-#import whoosh
-#from whoosh.qparser import MultifieldParser,QueryParser
 from datetime import date
 
 from urllib.request import urlopen
