@@ -61,11 +61,12 @@ for result in linksData:
                 print("FOUND REPO NAME",repo_name)
                 repo_names.append(repo_name)
         # work-around for non-upper AddictO: todo: fix this!
-        if repo_name != "ADDICTO":
+        if repo_name not in [ "ADDICTO", "BCIO" ]:
             source_repositories[repo_name] = source_url
         else: 
             #todo: url for AddictO not resolving - 
             source_repositories['ADDICTO'] = "https://raw.githubusercontent.com/addiction-ssa/addiction-ontology/master/addicto.owl" # source_url # todo: make this kluge exception for AddictO go away
+            source_repositories['BCIO']='https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio.owl' 
 
 print("source_repositories: ", source_repositories)
 
