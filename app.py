@@ -377,6 +377,11 @@ def home():
 
     return render_template("index.html", label_list=label_list, ontologies=ontologies)
 
+
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
+
 @app.route('/get_values', methods=['POST', 'GET'])
 def get_values():
     current_ontology=request.form.get("ontology") 
