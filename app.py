@@ -66,7 +66,7 @@ for result in linksData:
                 repo_names.append(repo_name)
         # work-around for non-upper AddictO: todo: fix this!
         if repo_name == 'BCIO': 
-            source_repositories['BCIO'] = "https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio.owx"
+            source_repositories['BCIO'] = "https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio.owl"
         elif repo_name == "ADDICTO": 
             source_repositories['ADDICTO'] = "https://raw.githubusercontent.com/addiction-ssa/addiction-ontology/master/addicto.owl"
         else: 
