@@ -16,7 +16,7 @@ DATABASE_URI = 'sqlite:////tmp/github-flask-ontospreaded.db'
 
 #todo: get RELEASE_FILES from BSSOFoundry?
 RELEASE_FILES = {"ADDICTO": "addicto-merged.owx",
-                 "BCIO": "Upper%20Level%20BCIO/bcio-merged.owx", 
+                 "BCIO": "Upper%20Level%20BCIO/bcio.owl",
                  "MF": "asdfaf", 
                  "MFOEM": "asdfasdf"}
 
