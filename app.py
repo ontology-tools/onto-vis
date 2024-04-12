@@ -1,20 +1,13 @@
-from cProfile import label
-from flask import Flask, request, g, session, redirect, url_for, render_template
-from flask import render_template_string, jsonify, Response, send_file
-from flask_cors import CORS
-import pyhornedowl
-import networkx
-import re
-from io import StringIO  #for download
-import requests #for download
-import threading
-import pydot
-
-import json
-
 from datetime import date
-
 from urllib.request import urlopen
+
+import networkx
+import pyhornedowl
+from pyhornedowl.model import *
+import requests  # for download
+from flask import Flask, request, render_template
+from flask import jsonify
+from flask_cors import CORS
 
 from config import *
 
@@ -71,6 +64,7 @@ for result in linksData:
 print("source_repositories: ", source_repositories)
 
 class OntologyDataStore:
+    releases: dict[str, pyhornedowl.PyIndexedOntology]
     node_props = {"shape":"box","style":"rounded", "font": "helvetica"}
     rel_cols = {"has part":"blue","part of":"blue","contains":"green",
                 "has role":"darkgreen","is about":"darkgrey",
@@ -145,17 +139,17 @@ class OntologyDataStore:
                     for a in axioms:
                         # print("AXIOM LOOKING AT: ", a)
                         # Example: ['SubClassOf', 'http://purl.obolibrary.org/obo/CHEBI_27732', ['ObjectSomeValuesFrom', 'http://purl.obolibrary.org/obo/RO_0000087', 'http://purl.obolibrary.org/obo/CHEBI_60809']]
-                        if len(a) == 3 and a[0]=='AxiomKind::SubClassOf' \
-                            and isinstance(a[2], list) and len(a[2])==3 \
-                            and a[2][0]=='ObjectSomeValuesFrom':
-                            relIri = a[2][1][1] 
-                            targetIri = a[2][2]
-                            if isinstance(targetIri, list): # not dealing with nested lists 
-                                # ignore lists
-                                pass
-                            else: 
+                        if isinstance(a.axiom, SubClassOf) and isinstance(a.axiom.sup, ObjectSomeValuesFrom):
+                        # if len(a) == 3 and a[0]=='AxiomKind::SubClassOf' \
+                        #     and isinstance(a[2], list) and len(a[2])==3 \
+                        #     and a[2][0]=='ObjectSomeValuesFrom':
+                            relIri = str(a.axiom.sup.ope.first)
+                            # relIri = a[2][1][1] 
+                            target = a.axiom.sup.bce
+                            # targetIri = a[2][2]
+                            if isinstance(target, Class):
                                 rel_name = self.releases[repo].get_annotation(relIri, app.config['RDFSLABEL'])
-                                targetLabel = self.releases[repo].get_annotation(targetIri, app.config['RDFSLABEL'])
+                                targetLabel = self.releases[repo].get_annotation(str(target.first), app.config['RDFSLABEL'])
                                 if rel_name is None:
                                     pass
                                 else:
