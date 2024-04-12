@@ -8,6 +8,7 @@ import requests  # for download
 from flask import Flask, request, render_template
 from flask import jsonify
 from flask_cors import CORS
+from typing import Dict
 
 from config import *
 
@@ -64,7 +65,7 @@ for result in linksData:
 print("source_repositories: ", source_repositories)
 
 class OntologyDataStore:
-    releases: dict[str, pyhornedowl.PyIndexedOntology]
+    releases: Dict[str, pyhornedowl.PyIndexedOntology]
     node_props = {"shape":"box","style":"rounded", "font": "helvetica"}
     rel_cols = {"has part":"blue","part of":"blue","contains":"green",
                 "has role":"darkgreen","is about":"darkgrey",
