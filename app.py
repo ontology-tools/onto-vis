@@ -55,7 +55,7 @@ for result in linksData:
                 print("FOUND REPO NAME",repo_name)
                 repo_names.append(repo_name)
         # work-around for non-upper AddictO: todo: fix this!
-        if repo_name not in [ "ADDICTO", "BCIO" ]:
+        if repo_name not in [ "ADDICTO", "BCIO", "GMHO" ]:
             source_repositories[repo_name] = source_url
         else: 
             #todo: url for AddictO not resolving - 
