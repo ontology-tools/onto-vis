@@ -60,7 +60,8 @@ for result in linksData:
         else: 
             #todo: url for AddictO not resolving - 
             source_repositories['ADDICTO'] = "https://raw.githubusercontent.com/addiction-ssa/addiction-ontology/master/addicto.owl" # source_url # todo: make this kluge exception for AddictO go away
-            source_repositories['BCIO']='https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio.owl' 
+            source_repositories['BCIO']='https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio.owl'
+            source_repositories['GMHO']="https://raw.githubusercontent.com/galenos-project/mental-health-ontology/main/gmho.owl"
 
 print("source_repositories: ", source_repositories)
 
