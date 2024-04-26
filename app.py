@@ -179,7 +179,10 @@ class OntologyDataStore:
         all_IDs = set()
         for classIri in self.releases[repo].get_classes():
             classId = self.releases[repo].get_id_for_iri(classIri)
-            all_IDs.add(classId)
+            if classId is None:
+                print(f"[WARNING] Could not determine ID for IRI '{classIri}'")
+            else:
+                all_IDs.add(classId)
         if len(excludes) < 1 or (len(excludes) == 1 and excludes[0] == ""): 
             all_IDs = all_IDs
         else:
