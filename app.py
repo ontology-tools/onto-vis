@@ -105,7 +105,7 @@ class OntologyDataStore:
             self.releasedates[repo] = date.today()
             prefixes = app.config['PREFIXES'] #todo: get these from BSSOFoundry instead of config? 
             for prefix in prefixes:
-                self.releases[repo].add_prefix_mapping(prefix[0],prefix[1])
+                self.releases[repo].prefix_mapping.add_prefix(prefix[0],prefix[1])
             for classIri in self.releases[repo].get_classes():
                 classId = self.releases[repo].get_id_for_iri(classIri)
                 if classId:
@@ -141,13 +141,13 @@ class OntologyDataStore:
                     for a in axioms:
                         # print("AXIOM LOOKING AT: ", a)
                         # Example: ['SubClassOf', 'http://purl.obolibrary.org/obo/CHEBI_27732', ['ObjectSomeValuesFrom', 'http://purl.obolibrary.org/obo/RO_0000087', 'http://purl.obolibrary.org/obo/CHEBI_60809']]
-                        if isinstance(a.axiom, SubClassOf) and isinstance(a.axiom.sup, ObjectSomeValuesFrom):
+                        if isinstance(a.component, SubClassOf) and isinstance(a.component.sup, ObjectSomeValuesFrom):
                         # if len(a) == 3 and a[0]=='AxiomKind::SubClassOf' \
                         #     and isinstance(a[2], list) and len(a[2])==3 \
                         #     and a[2][0]=='ObjectSomeValuesFrom':
-                            relIri = str(a.axiom.sup.ope.first)
+                            relIri = str(a.component.sup.ope.first)
                             # relIri = a[2][1][1] 
-                            target = a.axiom.sup.bce
+                            target = a.component.sup.bce
                             # targetIri = a[2][2]
                             if isinstance(target, Class):
                                 rel_name = self.releases[repo].get_annotation(relIri, app.config['RDFSLABEL'])

@@ -1,5 +1,5 @@
 Flask==2.3.3
-py-horned-owl==0.2.2
+py-horned-owl==1.0.1
 flask_cors
 requests
 networkx
