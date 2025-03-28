@@ -16,7 +16,7 @@ DATABASE_URI = 'sqlite:////tmp/github-flask-ontospreaded.db'
 
 #todo: get RELEASE_FILES from BSSOFoundry?
 RELEASE_FILES = {"ADDICTO": "addicto-merged.owx",
-                 "BCIO": "Upper%20Level%20BCIO/bcio-merged.owl",
+                 "BCIO": "Upper%20Level%20BCIO/bcio.owl",
                  "MF": "asdfaf", 
                  "MFOEM": "asdfasdf"}
 
@@ -50,7 +50,17 @@ PREFIXES = [ ["ADDICTO","http://addictovocab.org/ADDICTO_"],
              ["GAZ","http://purl.obolibrary.org/obo/GAZ_"],
              ["GSSO","http://purl.obolibrary.org/obo/GSSO_"], 
              ["GO","http://purl.obolibrary.org/obo/GO_"],
-             ["NBO","http://purl.obolibrary.org/obo/NBO_"]
+             ["NBO","http://purl.obolibrary.org/obo/NBO_"],
+             ["RBBO","https://purl.org/turbbo/RBBO_"],
+             ["GMHO", "https://galenos.org.uk/ontologies/GMHO_"],
+             ["PR", "http://purl.obolibrary.org/obo/PR_"],
+             ["STATO", "http://purl.obolibrary.org/obo/STATO_"],
+             ["CMO", "http://purl.obolibrary.org/obo/CMO_"],
+             ["EFO", "http://www.ebi.ac.uk/efo/EFO_"],
+             ["OMIABIS", "http://purl.obolibrary.org/obo/OMIABIS_"],
+             ["OPMI", "http://purl.obolibrary.org/obo/OPMI_"],
+             ["COB", "http://purl.obolibrary.org/obo/COB_"],
+             ["COPPER", "http://COPPER/ontology/COPPER_"]
            ]
 
 RDFSLABEL = "http://www.w3.org/2000/01/rdf-schema#label"

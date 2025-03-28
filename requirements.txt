@@ -1,7 +1,5 @@
 Flask==2.3.3
-py-horned-owl
-uwsgi
-itsdangerous==2.0.1
+py-horned-owl==1.0.1
 flask_cors
 requests
 networkx
