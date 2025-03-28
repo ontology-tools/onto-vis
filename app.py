@@ -3,12 +3,11 @@ from urllib.request import urlopen
 
 import networkx
 import pyhornedowl
-from pyhornedowl.model import *
 import requests  # for download
 from flask import Flask, request, render_template
 from flask import jsonify
 from flask_cors import CORS
-from typing import Dict
+from pyhornedowl.model import *
 
 from config import *
 
@@ -89,7 +88,10 @@ class OntologyDataStore:
         print("got location", location)
         data = self.resolve(location) # resolves redirects
         print("got data", data)
-        data = urlopen(location).read()  # .read for bytes - needed? 
+        if data is None:
+            print("Data is none, skipping", repo)
+            return ()
+        data = urlopen(location).read()  # .read for bytes - needed?
         ontofile = data.decode('utf-8')
 
         # Parse it
@@ -349,7 +351,8 @@ def get_ids_for_one(current_ontol):
                 checklist.append(classId + "|"+ label)                   
                 # print(classId, ": ", label)
             elif classId:
-                checklist.append(classId) 
+                if classId not in checklist:
+                    checklist.append(classId)
                     
     return checklist
 
@@ -361,6 +364,12 @@ def home():
     label_list = get_ids(ontologies)
 
     return render_template("index.html", label_list=label_list, ontologies=ontologies)
+
+
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
+
 
 @app.route('/get_values', methods=['POST', 'GET'])
 def get_values():
