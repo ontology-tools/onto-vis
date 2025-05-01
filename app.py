@@ -56,7 +56,7 @@ for result in linksData:
         # work-around for non-upper AddictO: todo: fix this!
         if repo_name not in [ "ADDICTO", "BCIO", "GMHO" ]:
             source_repositories[repo_name] = source_url
-        else: 
+        else:
             #todo: url for AddictO not resolving - 
             source_repositories['ADDICTO'] = "https://raw.githubusercontent.com/addiction-ssa/addiction-ontology/master/addicto.owl" # source_url # todo: make this kluge exception for AddictO go away
             source_repositories['BCIO']='https://raw.githubusercontent.com/HumanBehaviourChangeProject/ontologies/master/Upper%20Level%20BCIO/bcio.owl'
@@ -65,7 +65,7 @@ for result in linksData:
 print("source_repositories: ", source_repositories)
 
 class OntologyDataStore:
-    releases: Dict[str, pyhornedowl.PyIndexedOntology]
+    releases: dict[str, pyhornedowl.PyIndexedOntology]
     node_props = {"shape":"box","style":"rounded", "font": "helvetica"}
     rel_cols = {"has part":"blue","part of":"blue","contains":"green",
                 "has role":"darkgreen","is about":"darkgrey",
