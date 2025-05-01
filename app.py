@@ -69,7 +69,7 @@ print("source_repositories: ", source_repositories)
 
 
 class OntologyDataStore:
-    releases: Dict[str, pyhornedowl.PyIndexedOntology]
+    releases: dict[str, pyhornedowl.PyIndexedOntology]
     node_props = {"shape": "box", "style": "rounded", "font": "helvetica"}
     rel_cols = {"has part": "blue", "part of": "blue", "contains": "green",
                 "has role": "darkgreen", "is about": "darkgrey",
