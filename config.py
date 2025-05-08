@@ -60,7 +60,7 @@ PREFIXES = [ ["ADDICTO","http://addictovocab.org/ADDICTO_"],
              ["OMIABIS", "http://purl.obolibrary.org/obo/OMIABIS_"],
              ["OPMI", "http://purl.obolibrary.org/obo/OPMI_"],
              ["COB", "http://purl.obolibrary.org/obo/COB_"],
-             ["COPPER", "http://COPPER/ontology/COPPER_"]
+             ["COPPER", "https://github.com/EBehaviourChange-COPPER/ontology/blob/main/COPPER_"],
            ]
 
 RDFSLABEL = "http://www.w3.org/2000/01/rdf-schema#label"

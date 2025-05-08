@@ -97,7 +97,7 @@ class OntologyDataStore:
         # Parse it
         if ontofile:
             try:
-                self.releases[repo] = pyhornedowl.open_ontology(ontofile)
+                self.releases[repo] = pyhornedowl.open_ontology_from_string(ontofile, location.split(".")[-1])
             except:
                 print("Got an error when parsing",repo)
                 print("Skipping....")
