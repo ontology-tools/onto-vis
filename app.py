@@ -45,7 +45,7 @@ for result in linksData:
     else:
         md_html = requests.get(download_url, headers=headers).text
 
-        print(md_html)  # full result for testing
+        # print(md_html)  # full result for testing
         for line in md_html.split('\n'):
             if "source_url: " in line:
                 source_url = line.replace("source_url: ", "").strip()
@@ -53,7 +53,7 @@ for result in linksData:
         for line in md_html.split('\n'):
             if "id: " in line and line.startswith("id") and "- id: " not in line and "orcid" not in line:
                 repo_name = line.replace("id: ", "").strip().upper()
-                print("FOUND REPO NAME", repo_name)
+                # print("FOUND REPO NAME", repo_name)
                 repo_names.append(repo_name)
         # work-around for non-upper AddictO: todo: fix this!
         if repo_name not in ["ADDICTO", "BCIO", "GMHO"]:
@@ -67,7 +67,7 @@ for result in linksData:
             source_repositories[
                 'GMHO'] = "https://raw.githubusercontent.com/galenos-project/mental-health-ontology/main/gmho.owl"
 
-print("source_repositories: ", source_repositories)
+# print("source_repositories: ", source_repositories)
 
 
 class OntologyDataStore:
@@ -93,7 +93,7 @@ class OntologyDataStore:
         location = repo_detail
         print("got location", location)
         data = self.resolve(location)  # resolves redirects
-        print("got data", data)
+        # print("got data", data)
         if data is None:
             print("Data is none, skipping", repo)
             return ()
