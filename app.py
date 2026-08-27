@@ -2,6 +2,8 @@ from datetime import date
 from urllib.request import urlopen
 
 import networkx
+import networkx.exception
+import networkx.algorithms.dag
 import pyhornedowl
 import requests  # for download
 from flask import Flask, request, render_template
@@ -208,7 +210,7 @@ class OntologyDataStore:
                     entryIri = self.releases[repo].get_iri_for_id(id.replace("_", ":"))
 
                     if entryIri:
-                        descs = pyhornedowl.get_descendants(self.releases[repo], entryIri)
+                        descs = self.releases[repo].get_descendants(entryIri)
                         for d in descs:
                             ids.append(self.releases[repo].get_id_for_iri(d).replace(":", "_"))
 
@@ -367,6 +369,7 @@ def get_ids_for_one(current_ontol):
 
     return checklist
 
+print("Loaded")
 
 @app.route('/')
 @app.route('/home')
