@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { LOGO_ALT, LOGO_URL } from '../logo.js'
+import { LOGO_URL } from '../logo.js'
 
 const props = defineProps({
   status: { type: Object, required: true }
@@ -27,7 +27,7 @@ const headline = computed(() => ({
 <template>
   <div class="boot">
     <div class="boot__card">
-      <img :src="LOGO_URL" :alt="LOGO_ALT" class="brand-logo boot__logo" />
+      <img :src="LOGO_URL" class="brand-logo boot__logo" />
 
       <p class="boot__status">{{ headline }}</p>
 

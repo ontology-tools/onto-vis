@@ -46,6 +46,7 @@ const tooSmallToRead = computed(() => Boolean(svgMarkup.value) && transform.valu
 
 const emptyState = computed(() => {
   if (busy.value || renderError.value || props.message || svgMarkup.value) return null
+  
   return 'Pick an ontology and the classes you want to see, then render the graph.'
 })
 
@@ -291,8 +292,6 @@ defineExpose({ fitToView, fitToNodes, zoomBy, getSvg: () => svgMarkup.value })
     @pointercancel="onPointerUp"
     @wheel="onWheel"
   >
-    <div class="graph__grid" aria-hidden="true" />
-
     <!-- Class name is load-bearing: fitToNodes() looks the stage up by it. -->
     <div class="graph-stage" :style="stageStyle" v-html="svgMarkup" />
 
@@ -335,14 +334,6 @@ defineExpose({ fitToView, fitToNodes, zoomBy, getSvg: () => svgMarkup.value })
 }
 .graph.is-dragging { cursor: grabbing; }
 
-.graph__grid {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0);
-  background-size: 26px 26px;
-  opacity: 0.5;
-  pointer-events: none;
-}
 
 .graph-stage {
   position: absolute;

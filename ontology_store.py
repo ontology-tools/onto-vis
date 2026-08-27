@@ -6,9 +6,12 @@ a load is still in progress: repositories are published into ``releases`` only
 once they are completely parsed.
 """
 
+from dataclasses import dataclass, replace, asdict
 import re
 import threading
 from datetime import date
+import traceback
+from typing import Literal
 from urllib.request import urlopen
 
 import networkx
@@ -16,7 +19,15 @@ import networkx.algorithms.dag
 import networkx.exception
 import pyhornedowl
 import requests
-from pyhornedowl.model import Class, ObjectSomeValuesFrom, SubClassOf
+from pyhornedowl.model import (
+    Class,
+    ObjectProperty,
+    ObjectPropertyExpression,
+    ObjectSomeValuesFrom,
+    SubClassOf,
+)
+
+RDFSLABEL = "http://www.w3.org/2000/01/rdf-schema#label"
 
 BSSO_CONTENTS_URL = (
     "https://api.github.com/repos/bssofoundry/bssofoundry.github.io"
@@ -58,7 +69,7 @@ PALETTE = {
 }
 
 
-def discover_source_repositories():
+def discover_source_repositories() -> dict[str, str]:
     """Read the ontology registry on BSSOFoundry and return ``{id: owl_url}``."""
     response = requests.get(BSSO_CONTENTS_URL, headers=GITHUB_HEADERS, timeout=30)
     response.raise_for_status()
@@ -88,7 +99,7 @@ def discover_source_repositories():
     return {name: url for name, url in sources.items() if url}
 
 
-def wrap_label(label, width=18):
+def wrap_label(label: str, width: int = 18) -> str:
     """Break a label onto several lines so graphviz nodes stay compact."""
     words = label.split()
     if not words:
@@ -104,42 +115,76 @@ def wrap_label(label, width=18):
     return "\n".join(lines)
 
 
+@dataclass(frozen=True)
+class Progress:
+    state: Literal["idle", "discovering", "loading", "ready", "error"]
+    loaded: list[str]
+    pending: list[str]
+    current: str | None
+    failed: dict[str, str]
+    error: str | None
+
+
+@dataclass
+class Term:
+    id: str
+    curie: str
+    label: str
+    definition: str
+    synonyms: list[str]
+    iri: str
+    repo: str
+
+
 class OntologyDataStore:
     """Parsed ontologies plus the indexes the API serves from."""
 
-    def __init__(self, prefixes, rdfs_label):
+    releases: dict[str, pyhornedowl.PyIndexedOntology]
+    loadtimes: dict[str, str]
+    graphs: dict[str, networkx.MultiDiGraph]
+    terms: dict[str, dict[str, Term]]
+    label_to_id: dict[str, dict[str, str]]
+    progress: Progress
+    sources: dict[str, str]
+    _lock: threading.Lock
+
+    def __init__(self, prefixes: dict[str, str], sources: dict[str, str] | None = None):
         self.prefixes = prefixes
-        self.rdfs_label = rdfs_label
 
         self.releases = {}
-        self.releasedates = {}
+        self.loadtimes = {}
         self.graphs = {}
-        self.terms = {}          # repo -> {id: term dict}
-        self.label_to_id = {}    # repo -> {label: id}
+        self.terms = {}  # repo -> {id: term dict}
+        self.label_to_id = {}  # repo -> {label: id}
 
-        self.sources = {}
-        self.progress = {
-            "state": "idle",     # idle | discovering | loading | ready | error
-            "loaded": [],
-            "pending": [],
-            "current": None,
-            "failed": {},
-            "error": None,
-        }
+        self.sources = sources if sources is not None else {}
+        self.progress = Progress(
+            state="idle",
+            loaded=[],
+            pending=[],
+            current=None,
+            failed={},
+            error=None,
+        )
         self._lock = threading.Lock()
 
     # ------------------------------------------------------------------ load
 
     def load_all_async(self):
-        threading.Thread(target=self.load_all, name="ontology-loader", daemon=True).start()
+        threading.Thread(
+            target=self.load_all, name="ontology-loader", daemon=True
+        ).start()
 
     def load_all(self):
         try:
-            self._set_progress(state="discovering")
-            self.sources = discover_source_repositories()
+            if len(self.sources) == 0:
+                self._set_progress(state="discovering")
+                self.sources =  discover_source_repositories()
             self._set_progress(state="loading", pending=sorted(self.sources))
         except Exception as exc:  # network / GitHub problem
-            self._set_progress(state="error", error=f"Could not read the ontology registry: {exc}")
+            self._set_progress(
+                state="error", error=f"Could not read the ontology registry: {exc}"
+            )
             return
 
         for repo in sorted(self.sources):
@@ -147,41 +192,38 @@ class OntologyDataStore:
             try:
                 self.parse_release(repo)
                 with self._lock:
-                    self.progress["loaded"].append(repo)
+                    self.progress.loaded.append(repo)
             except Exception as exc:
+                print(f"Failed to load {repo}:")
+                traceback.print_exc()
                 with self._lock:
-                    self.progress["failed"][repo] = str(exc)
+                    self.progress.failed[repo] = str(exc)
             finally:
                 with self._lock:
-                    if repo in self.progress["pending"]:
-                        self.progress["pending"].remove(repo)
+                    if repo in self.progress.pending:
+                        self.progress.pending.remove(repo)
 
         self._set_progress(state="ready", current=None)
 
     def _set_progress(self, **kwargs):
         with self._lock:
-            self.progress.update(kwargs)
+            self.progress = replace(self.progress, **kwargs)
 
-    def get_progress(self):
+    def get_progress(self) -> Progress:
         with self._lock:
-            progress = dict(self.progress)
-            progress["loaded"] = list(progress["loaded"])
-            progress["pending"] = list(progress["pending"])
-            progress["failed"] = dict(progress["failed"])
-            progress["ready"] = progress["state"] in ("ready", "error")
-            return progress
+            return replace(self.progress)
 
-    def parse_release(self, repo):
+    def parse_release(self, repo: str):
         location = self.sources[repo]
         ontofile = urlopen(location).read().decode("utf-8")
         ontology = pyhornedowl.open_ontology(ontofile)
 
-        for prefix, expansion in self.prefixes:
-            ontology.prefix_mapping.add_prefix(prefix, expansion)
+        for prefix, expansion in self.prefixes.items():
+            ontology.prefix_mapping.add_prefix(prefix, expansion) 
 
         graph = networkx.MultiDiGraph()
         terms = {}
-        label_to_id = {}
+        label_to_id: dict[str, str] = {}
 
         for class_iri in ontology.get_classes():
             class_id = ontology.get_id_for_iri(class_iri)
@@ -191,24 +233,28 @@ class OntologyDataStore:
             if class_id in terms:
                 continue
 
-            label = ontology.get_annotation(class_iri, self.rdfs_label)
+            label = ontology.get_annotation(class_iri, RDFSLABEL)
             label = label.strip() if label else class_id.replace("_", ":")
             definition = ontology.get_annotation(class_iri, DEFN) or ""
             try:
-                synonyms = [s.strip() for s in ontology.get_annotations(class_iri, SYN) or [] if s]
+                synonyms = [
+                    s.strip()
+                    for s in ontology.get_annotations(class_iri, SYN) or []
+                    if s
+                ]
             except Exception:
                 synonym = ontology.get_annotation(class_iri, SYN)
                 synonyms = [synonym.strip()] if synonym else []
 
-            terms[class_id] = {
-                "id": class_id,
-                "curie": class_id.replace("_", ":"),
-                "label": label,
-                "definition": definition.strip(),
-                "synonyms": synonyms,
-                "iri": str(class_iri),
-                "repo": repo,
-            }
+            terms[class_id] = Term(
+                id=class_id,
+                curie=class_id.replace("_", ":"),
+                label=label,
+                definition=definition.strip(),
+                synonyms=synonyms,
+                iri=str(class_iri),
+                repo=repo,
+            )
             label_to_id.setdefault(label, class_id)
             graph.add_node(class_id, label=wrap_label(label), tooltip=label)
 
@@ -222,75 +268,79 @@ class OntologyDataStore:
             for parent in ontology.get_superclasses(class_iri):
                 parent_id = ontology.get_id_for_iri(parent)
                 if parent_id and parent_id.replace(":", "_") in terms:
-                    graph.add_edge(parent_id.replace(":", "_"), class_id, kind="subclass")
+                    graph.add_edge(
+                        parent_id.replace(":", "_"), class_id, kind="subclass"
+                    )
 
             for axiom in ontology.get_axioms_for_iri(class_iri):
                 component = axiom.component
-                if not isinstance(component, SubClassOf):
-                    continue
-                if not isinstance(component.sup, ObjectSomeValuesFrom):
-                    continue
-                target = component.sup.bce
-                if not isinstance(target, Class):
-                    continue
+                match component:
+                    case SubClassOf(
+                        sup=ObjectSomeValuesFrom(
+                            bce=Class(first=_ as target),
+                            ope=ObjectProperty(first=_ as ope),
+                        )
+                    ):
 
-                rel_name = ontology.get_annotation(str(component.sup.ope.first), self.rdfs_label)
-                if not rel_name:
-                    continue
-                target_id = ontology.get_id_for_iri(str(target.first))
-                if not target_id:
-                    continue
-                target_id = target_id.replace(":", "_")
-                if target_id not in terms or target_id == class_id:
-                    continue
+                        rel_name = ontology.get_annotation(str(ope), RDFSLABEL)
+                        if not rel_name:
+                            continue
+                        target_id = ontology.get_id_for_iri(str(target))
+                        if not target_id:
+                            continue
+                        target_id = target_id.replace(":", "_")
+                        if target_id not in terms or target_id == class_id:
+                            continue
 
-                graph.add_edge(class_id, target_id, kind="relation", label=rel_name.strip())
+                        graph.add_edge(
+                            class_id, target_id, kind="relation", label=rel_name.strip()
+                        )
 
         # Publish only once fully parsed, so readers never see a half-built repo.
         self.releases[repo] = ontology
         self.graphs[repo] = graph
         self.terms[repo] = terms
         self.label_to_id[repo] = label_to_id
-        self.releasedates[repo] = date.today().isoformat()
+        self.loadtimes[repo] = date.today().isoformat()
 
     # ---------------------------------------------------------------- query
 
-    def available_repos(self):
+    def available_repos(self) -> list[str]:
         return sorted(self.releases)
 
-    def repo_summaries(self):
+    def repo_summaries(self) -> list[dict]:
         return [
             {
                 "id": repo,
                 "termCount": len(self.terms.get(repo, {})),
                 "edgeCount": self.graphs[repo].number_of_edges(),
-                "loadedOn": self.releasedates.get(repo),
+                "loadedOn": self.loadtimes.get(repo),
                 "source": self.sources.get(repo),
             }
             for repo in self.available_repos()
         ]
 
-    def search(self, repos, query, limit=25):
+    def search(self, repos: list[str], query: str, limit: int = 25) -> list[Term]:
         """Rank terms by how well they match ``query`` (id, label or synonym)."""
         query = (query or "").strip().lower()
         if not query:
             return []
 
-        results = []
+        results: list[tuple[int, int, Term]] = []
         for repo in repos:
             for term in self.terms.get(repo, {}).values():
                 score = self._score(term, query)
                 if score is not None:
-                    results.append((score, len(term["label"]), term))
+                    results.append((score, len(term.label), term))
 
         results.sort(key=lambda row: (row[0], row[1]))
         return [term for _, _, term in results[:limit]]
 
     @staticmethod
-    def _score(term, query):
+    def _score(term: Term, query: str) -> int | None:
         """Lower is better; ``None`` means no match."""
-        label = term["label"].lower()
-        curie = term["curie"].lower()
+        label = term.label.lower()
+        curie = term.curie.lower()
 
         if curie == query or label == query:
             return 0
@@ -300,30 +350,30 @@ class OntologyDataStore:
             return 2
         if query in label:
             return 3
-        if any(query in synonym.lower() for synonym in term["synonyms"]):
+        if any(query in synonym.lower() for synonym in term.synonyms):
             return 4
         if query in curie:
             return 5
         return None
 
-    def get_term(self, repo, term_id):
+    def get_term(self, repo: str, term_id: str) -> Term | None:
         return self.terms.get(repo, {}).get(term_id.replace(":", "_"))
 
-    def find_term(self, repos, term_id):
+    def find_term(self, repos: list[str], term_id: str) -> Term | None:
         for repo in repos:
             term = self.get_term(repo, term_id)
             if term:
                 return term
         return None
 
-    def related_ids(self, repo, selected_ids):
+    def related_ids(self, repo: str, selected_ids: list[str]) -> list[str]:
         """The selected classes plus their ancestors and all their descendants."""
         ontology = self.releases.get(repo)
         graph = self.graphs.get(repo)
         if ontology is None or graph is None:
-            return []
+            raise ValueError(f"Unknown repository '{repo}'")
 
-        ids = set()
+        ids: set[str] = set()
         for raw_id in selected_ids:
             term_id = raw_id.replace(":", "_")
             if term_id not in self.terms.get(repo, {}):
@@ -331,15 +381,15 @@ class OntologyDataStore:
             ids.add(term_id)
 
             entry_iri = ontology.get_iri_for_id(term_id.replace("_", ":"))
-            if entry_iri:
+            if entry_iri is not None:
                 for descendant in ontology.get_descendants(entry_iri):
-                    found = ontology.get_id_for_iri(descendant)
-                    if found:
-                        ids.add(found.replace(":", "_"))
+                    entity_id = ontology.get_id_for_iri(descendant)
+                    if entity_id is not None:
+                        ids.add(entity_id.replace(":", "_"))
                 for superclass in ontology.get_superclasses(entry_iri):
-                    found = ontology.get_id_for_iri(superclass)
-                    if found:
-                        ids.add(found.replace(":", "_"))
+                    entity_id = ontology.get_id_for_iri(superclass)
+                    if entity_id is not None:
+                        ids.add(entity_id.replace(":", "_"))
 
             try:
                 ids.update(networkx.algorithms.dag.descendants(graph, term_id))
@@ -348,30 +398,40 @@ class OntologyDataStore:
 
         return sorted(ids)
 
-    def build_subgraph(self, repos, selected_ids, excluded_ids):
+    def build_subgraph(
+        self, repos: list[str], selected_ids: list[str], excluded_ids: list[str]
+    ) -> networkx.MultiDiGraph:
         excluded = {i.replace(":", "_") for i in excluded_ids if i}
-        subgraphs = []
+        subgraphs: list[networkx.MultiDiGraph] = []
 
         for repo in repos:
             if repo not in self.graphs:
                 continue
-            if selected_ids:
-                ids = set(self.related_ids(repo, selected_ids))
-            else:
-                ids = set(self.terms.get(repo, {}))
+
+            match selected_ids:
+                case []:
+                    ids = set(self.terms.get(repo, {}))
+                case _:
+                    ids = set(self.related_ids(repo, selected_ids))
+
             subgraphs.append(self.graphs[repo].subgraph(ids - excluded))
 
-        if not subgraphs:
+        if len(subgraphs) == 0:
             return networkx.MultiDiGraph()
+
         return networkx.compose_all(subgraphs)
 
     # ------------------------------------------------------------------ dot
 
-    def to_dot(self, graph, highlight=()):
+    def to_dot(
+        self, graph: networkx.MultiDiGraph, highlight: set[str] | None = None
+    ) -> str:
         """Render a networkx graph as DOT source for graphviz."""
         palette = PALETTE
         colours = REL_COLOURS
-        highlight = {i.replace(":", "_") for i in highlight}
+        highlight = (
+            {i.replace(":", "_") for i in highlight} if highlight is not None else set()
+        )
 
         lines = [
             "digraph ontology {",
@@ -387,7 +447,10 @@ class OntologyDataStore:
 
         for node_id, attrs in graph.nodes(data=True):
             label = attrs.get("label", node_id)
-            node_attrs = [f'label="{_escape(label)}"', f'tooltip="{_escape(attrs.get("tooltip", label))}"']
+            node_attrs = [
+                f'label="{_escape(label)}"',
+                f'tooltip="{_escape(attrs.get("tooltip", label))}"',
+            ]
             if node_id in highlight:
                 node_attrs.append(f'fillcolor="{palette["highlight_fill"]}"')
                 node_attrs.append(f'color="{palette["highlight_line"]}"')
@@ -399,7 +462,9 @@ class OntologyDataStore:
             if attrs.get("kind") == "relation":
                 rel_name = attrs.get("label", "")
                 colour = colours.get(rel_name, colours["_default"])
-                edge_attrs = f'label="{_escape(rel_name)}" color="{colour}" fontcolor="{colour}"'
+                edge_attrs = (
+                    f'label="{_escape(rel_name)}" color="{colour}" fontcolor="{colour}"'
+                )
             else:
                 edge_attrs = f'dir=back color="{palette["edge"]}"'
             lines.append(f'  "{source}" -> "{target}" [{edge_attrs}];')

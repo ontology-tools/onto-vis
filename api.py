@@ -1,5 +1,7 @@
 """JSON API consumed by the Vue front end."""
 
+from dataclasses import asdict
+
 from flask import Blueprint, current_app, jsonify, request
 
 api = Blueprint("api", __name__, url_prefix="/api")
@@ -30,8 +32,9 @@ def _requested_repos(default_to_all=True):
 @api.get("/status")
 def status():
     """Loading progress — the front end polls this until ``ready``."""
-    progress = store().get_progress()
+    progress = asdict(store().get_progress())
     progress["repositories"] = store().repo_summaries()
+    progress["ready"] = progress["state"] in ("ready", "error")
     return jsonify(progress)
 
 

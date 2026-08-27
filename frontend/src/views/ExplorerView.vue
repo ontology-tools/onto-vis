@@ -2,7 +2,7 @@
 import { computed, inject, onActivated, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { buildGraph, fetchTerm } from '../api.js'
-import { LOGO_ALT, LOGO_URL } from '../logo.js'
+import { LOGO_URL } from '../logo.js'
 
 import GraphView from '../components/GraphView.vue'
 import OntologyPicker from '../components/OntologyPicker.vue'
@@ -34,7 +34,7 @@ const graphView = ref(null)
 
 let graphRequest = null
 
-const canRender = computed(() => selectedRepos.value.length > 0 && graphState.value !== 'loading')
+const canRender = computed(() => (selectedRepos.value.length > 0 || ontologies.value.length === 1) && graphState.value !== 'loading')
 const failedRepos = computed(() => Object.keys(status.value.failed || {}))
 
 const summary = computed(() => {
@@ -90,7 +90,15 @@ function writeQuery() {
 }
 
 async function render() {
-  if (!selectedRepos.value.length) return
+  if (selectedRepos.value.length == 0) {
+    if (ontologies.value.length === 1) {
+      selectedRepos.value = [ontologies.value[0].id]
+    } else {
+      graphMessage.value = 'Select at least one ontology.'
+      graphState.value = 'error'
+      return
+    }
+  }
 
   graphRequest?.abort()
   graphRequest = new AbortController()
@@ -185,8 +193,8 @@ function saveBlob(blob, filename) {
   <div class="shell" :class="{ 'shell--collapsed': !sidebarOpen }">
     <aside class="sidebar">
       <header class="sidebar__head">
-        <RouterLink :to="{ path: '/', query: route.query }" class="sidebar__brand">
-          <img :src="LOGO_URL" :alt="LOGO_ALT" class="brand-logo" />
+        <RouterLink to="/" class="sidebar__brand">
+          <img :src="LOGO_URL" class="brand-logo" />
         </RouterLink>
 
         <div class="sidebar__actions">
@@ -195,7 +203,7 @@ function saveBlob(blob, filename) {
       </header>
 
       <div class="sidebar__body scroll-area">
-        <section class="block">
+        <section class="block" v-if="ontologies?.length > 1">
           <label class="field-label">Ontologies</label>
           <OntologyPicker v-model="selectedRepos" :ontologies="ontologies" />
           <p v-if="failedRepos.length" class="hint hint--warn">
@@ -205,25 +213,16 @@ function saveBlob(blob, filename) {
 
         <section class="block">
           <label class="field-label">Classes to show</label>
-          <TagInput
-            v-model="include"
-            :repos="selectedRepos"
-            :disabled="!selectedRepos.length"
-            placeholder="Search by label or ID…"
-            variant="include"
-          />
-          <p class="hint">Each class is drawn with its ancestors and all of its descendants. Leave empty for the whole ontology.</p>
+          <TagInput v-model="include" :repos="selectedRepos" :disabled="!selectedRepos.length"
+            placeholder="Search by label or ID…" variant="include" />
+          <p class="hint">Each class is drawn with its ancestors and all of its descendants. Leave empty for the whole
+            ontology.</p>
         </section>
 
         <section class="block">
           <label class="field-label">Classes to exclude</label>
-          <TagInput
-            v-model="exclude"
-            :repos="selectedRepos"
-            :disabled="!selectedRepos.length"
-            placeholder="Search classes to leave out…"
-            variant="exclude"
-          />
+          <TagInput v-model="exclude" :repos="selectedRepos" :disabled="!selectedRepos.length"
+            placeholder="Search classes to leave out…" variant="exclude" />
         </section>
       </div>
 
@@ -245,33 +244,27 @@ function saveBlob(blob, filename) {
       </footer>
     </aside>
 
-    <button
-      class="sidebar-toggle"
-      :title="sidebarOpen ? 'Hide panel' : 'Show panel'"
-      :aria-label="sidebarOpen ? 'Hide panel' : 'Show panel'"
-      @click="sidebarOpen = !sidebarOpen"
-    >{{ sidebarOpen ? '‹' : '›' }}</button>
+    <button class="sidebar-toggle" :title="sidebarOpen ? 'Hide panel' : 'Show panel'"
+      :aria-label="sidebarOpen ? 'Hide panel' : 'Show panel'" @click="sidebarOpen = !sidebarOpen">{{ sidebarOpen ? '‹' :
+        '›' }}</button>
 
     <main class="canvas">
-      <GraphView
-        ref="graphView"
-        :dot="graph.dot"
-        :focus="graph.focus"
-        :status="graphState"
-        :message="graphMessage"
-      />
+      <GraphView ref="graphView" :dot="graph.dot" :focus="graph.focus" :status="graphState" :message="graphMessage" />
     </main>
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .shell {
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
   height: 100%;
   transition: grid-template-columns 0.22s ease;
 }
-.shell--collapsed { grid-template-columns: 0 1fr; }
+
+.shell--collapsed {
+  grid-template-columns: 0 1fr;
+}
 
 /* --------------------------------------------------------------- sidebar */
 .sidebar {
@@ -292,21 +285,54 @@ function saveBlob(blob, filename) {
   border-bottom: 1px solid var(--border);
 }
 
-.sidebar__brand { display: block; min-width: 0; }
+.sidebar__brand {
+  display: block;
+  min-width: 0;
+}
+
 /* Trimmed so the logo and the actions share the header without wrapping. */
-.sidebar__brand .brand-logo { max-width: 165px; }
+.sidebar__brand .brand-logo {
+  max-width: 165px;
+}
 
-.sidebar__actions { display: flex; align-items: center; gap: 2px; flex: none; }
+.sidebar__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+}
 
-.sidebar__link { padding: 7px 9px; font-size: 12.5px; color: var(--text-muted); }
-.sidebar__link:hover { color: var(--text); }
+.sidebar__link {
+  padding: 7px 9px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
 
-.sidebar__body { flex: 1; padding: 18px; }
+.sidebar__link:hover {
+  color: var(--text);
+}
 
-.block { margin-bottom: 24px; }
-.block:last-child { margin-bottom: 0; }
-.block .hint { margin: 8px 0 0; line-height: 1.5; }
-.hint--warn { color: var(--danger); }
+.sidebar__body {
+  flex: 1;
+  padding: 18px;
+}
+
+.block {
+  margin-bottom: 24px;
+}
+
+.block:last-child {
+  margin-bottom: 0;
+}
+
+.block .hint {
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+
+.hint--warn {
+  color: var(--danger);
+}
 
 .sidebar__foot {
   padding: 14px 18px 16px;
@@ -314,8 +340,14 @@ function saveBlob(blob, filename) {
   background: var(--surface);
 }
 
-.sidebar__buttons { display: flex; gap: 8px; }
-.sidebar__buttons .btn:first-child { flex: 1; }
+.sidebar__buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.sidebar__buttons .btn:first-child {
+  flex: 1;
+}
 
 .sidebar__export {
   display: flex;
@@ -324,8 +356,16 @@ function saveBlob(blob, filename) {
   gap: 8px;
   margin-top: 12px;
 }
-.sidebar__export-buttons { display: flex; gap: 2px; }
-.sidebar__export-buttons .btn { padding: 5px 9px; font-size: 12px; }
+
+.sidebar__export-buttons {
+  display: flex;
+  gap: 2px;
+}
+
+.sidebar__export-buttons .btn {
+  padding: 5px 9px;
+  font-size: 12px;
+}
 
 /* ---------------------------------------------------------------- canvas */
 .canvas {
@@ -352,14 +392,35 @@ function saveBlob(blob, filename) {
   box-shadow: var(--shadow-sm);
   transition: left 0.22s ease, background 0.12s ease;
 }
-.sidebar-toggle:hover { background: var(--surface-hover); color: var(--text); }
-.shell--collapsed .sidebar-toggle { left: 0; }
+
+.sidebar-toggle:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.shell--collapsed .sidebar-toggle {
+  left: 0;
+}
 
 /* ----------------------------------------------------------------- small */
 @media (max-width: 780px) {
-  .shell { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
-  .shell--collapsed { grid-template-rows: 0 1fr; }
-  .sidebar { max-height: 62vh; border-right: none; border-bottom: 1px solid var(--border); }
-  .sidebar-toggle { display: none; }
+  .shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .shell--collapsed {
+    grid-template-rows: 0 1fr;
+  }
+
+  .sidebar {
+    max-height: 62vh;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-toggle {
+    display: none;
+  }
 }
 </style>

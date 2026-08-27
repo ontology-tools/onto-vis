@@ -1,12 +1,12 @@
 <script setup>
-import { LOGO_ALT, LOGO_URL } from '../logo.js'
+import { LOGO_URL } from '../logo.js'
 </script>
 
 <template>
   <div class="page">
     <header class="page__head">
       <RouterLink to="/" class="page__brand">
-        <img :src="LOGO_URL" :alt="LOGO_ALT" class="brand-logo" />
+        <img :src="LOGO_URL" class="brand-logo" />
       </RouterLink>
 
       <div class="page__actions">
