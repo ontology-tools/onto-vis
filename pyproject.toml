@@ -1,0 +1,13 @@
+[project]
+name = "onto-vis"
+version = "1.0.0"
+description = "Web app for visualising the BSSO Foundry behavioural science ontologies"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "Flask>=2.3.3",
+    "flask-cors",
+    "py-horned-owl>=1.2.0",
+    "requests",
+    "networkx"
+]
