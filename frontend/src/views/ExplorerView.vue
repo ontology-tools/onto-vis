@@ -213,7 +213,7 @@ function saveBlob(blob, filename) {
 
         <section class="block">
           <label class="field-label">Classes to show</label>
-          <TagInput v-model="include" :repos="selectedRepos" :disabled="!selectedRepos.length"
+          <TagInput v-model="include" :repos="selectedRepos" :disabled="!selectedRepos.length && ontologies.length !== 1"
             placeholder="Search by label or ID…" variant="include" />
           <p class="hint">Each class is drawn with its ancestors and all of its descendants. Leave empty for the whole
             ontology.</p>
@@ -221,7 +221,7 @@ function saveBlob(blob, filename) {
 
         <section class="block">
           <label class="field-label">Classes to exclude</label>
-          <TagInput v-model="exclude" :repos="selectedRepos" :disabled="!selectedRepos.length"
+          <TagInput v-model="exclude" :repos="selectedRepos" :disabled="!selectedRepos.length && ontologies.length !== 1"
             placeholder="Search classes to leave out…" variant="exclude" />
         </section>
       </div>
